@@ -370,14 +370,14 @@
     <Container class="javax.swing.JDesktopPane" name="jDesktopPane1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="200" y="30" width="660" height="500"/>
+          <AbsoluteConstraints x="210" y="30" width="-1" height="-1"/>
         </Constraint>
       </Constraints>
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="660" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="650" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
