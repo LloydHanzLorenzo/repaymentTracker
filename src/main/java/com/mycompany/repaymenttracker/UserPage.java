@@ -123,6 +123,11 @@ public class UserPage extends javax.swing.JFrame {
 
         payPanelButton.setBackground(new java.awt.Color(204, 204, 204));
         payPanelButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        payPanelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                payPanelButtonMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout pane2Layout = new javax.swing.GroupLayout(pane2);
         pane2.setLayout(pane2Layout);
@@ -307,6 +312,11 @@ public class UserPage extends javax.swing.JFrame {
         ProfilePage profile = new ProfilePage();
         jDesktopPane1.add(profile).setVisible(true);
     }//GEN-LAST:event_profilePanelButtonMouseClicked
+
+    private void payPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMouseClicked
+        BorrowMoneyPage bmp = new BorrowMoneyPage();
+        jDesktopPane1.add(bmp).setVisible(true);
+    }//GEN-LAST:event_payPanelButtonMouseClicked
 
     /**
      * @param args the command line arguments
