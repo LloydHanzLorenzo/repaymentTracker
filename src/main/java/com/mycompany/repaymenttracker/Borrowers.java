@@ -28,8 +28,6 @@ public class Borrowers extends javax.swing.JInternalFrame {
     public Borrowers() {
         initComponents();
         
-        this.setLocationRelativeTo(null);
-        
         tblBorrowers.setModel(new DefaultTableModel (
                 new Object[][]{},
                 new String[]{"ID", "Full Name", "Birthdate", "Valid ID No.", "Email", "Phone", "Address", "Employment Status", "Monthly Income", "Existing Debt", "Loan Amount", "Loan Purpose", "Loan Status", "Application Date", "Approval Date", "Repayment Term", "Interest Rate", "Notes"}
