@@ -115,6 +115,14 @@ public class AdminPage extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Account");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel2MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pane1Layout = new javax.swing.GroupLayout(pane1);
         pane1.setLayout(pane1Layout);
@@ -150,6 +158,9 @@ public class AdminPage extends javax.swing.JFrame {
         jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel5.setPreferredSize(new java.awt.Dimension(204, 45));
         jPanel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel5MouseClicked(evt);
+            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jPanel5MousePressed(evt);
             }
@@ -158,6 +169,14 @@ public class AdminPage extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Trebuchet MS", 1, 17)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Repayment Calendar");
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel3MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel3MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pane2Layout = new javax.swing.GroupLayout(pane2);
         pane2.setLayout(pane2Layout);
@@ -201,6 +220,14 @@ public class AdminPage extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Borrowers");
+        jLabel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel4MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel4MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pane3Layout = new javax.swing.GroupLayout(pane3);
         pane3.setLayout(pane3Layout);
@@ -248,6 +275,14 @@ public class AdminPage extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Delinquent Accounts");
         jLabel5.setToolTipText("");
+        jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel5MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel5MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pane4Layout = new javax.swing.GroupLayout(pane4);
         pane4.setLayout(pane4Layout);
@@ -283,6 +318,9 @@ public class AdminPage extends javax.swing.JFrame {
         jPanel12.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel12.setPreferredSize(new java.awt.Dimension(204, 45));
         jPanel12.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel12MouseClicked(evt);
+            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jPanel12MousePressed(evt);
             }
@@ -291,6 +329,14 @@ public class AdminPage extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Algorithm");
+        jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel6MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel6MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pane5Layout = new javax.swing.GroupLayout(pane5);
         pane5.setLayout(pane5Layout);
@@ -456,6 +502,88 @@ public class AdminPage extends javax.swing.JFrame {
         pane4.setBackground(panedefault);
         pane5.setBackground(paneClick);
     }//GEN-LAST:event_jPanel12MousePressed
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        jDesktopPane1.removeAll();
+        AdminProfilePage APP = new AdminProfilePage();
+        jDesktopPane1.add(APP).setVisible(true);
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
+        jDesktopPane1.removeAll();
+        Borrowers BP = new Borrowers();
+        jDesktopPane1.add(BP).setVisible(true);
+    }//GEN-LAST:event_jLabel4MouseClicked
+
+    private void jLabel2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MousePressed
+        pane1.setBackground(paneClick);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
+        pane5.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel2MousePressed
+
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+        jDesktopPane1.removeAll();
+        RepaymentCalendarPage RCP = new RepaymentCalendarPage();
+        jDesktopPane1.add(RCP).setVisible(true);
+    }//GEN-LAST:event_jLabel3MouseClicked
+
+    private void jPanel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel5MouseClicked
+        jDesktopPane1.removeAll();
+        RepaymentCalendarPage RCP = new RepaymentCalendarPage();
+        jDesktopPane1.add(RCP).setVisible(true);
+    }//GEN-LAST:event_jPanel5MouseClicked
+
+    private void jLabel3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(paneClick);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
+        pane5.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel3MousePressed
+
+    private void jLabel4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(paneClick);
+        pane4.setBackground(panedefault);
+        pane5.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel4MousePressed
+
+    private void jLabel5MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(paneClick);
+        pane5.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel5MousePressed
+
+    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
+        jDesktopPane1.removeAll();
+        DelinquentAccounts ma = new DelinquentAccounts();
+        jDesktopPane1.add(ma).setVisible(true);
+    }//GEN-LAST:event_jLabel5MouseClicked
+
+    private void jPanel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseClicked
+        jDesktopPane1.removeAll();
+        AlgorithmPage AP = new AlgorithmPage();
+        jDesktopPane1.add(AP).setVisible(true);
+    }//GEN-LAST:event_jPanel12MouseClicked
+
+    private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
+        jDesktopPane1.removeAll();
+        AlgorithmPage AP = new AlgorithmPage();
+        jDesktopPane1.add(AP).setVisible(true);
+    }//GEN-LAST:event_jLabel6MouseClicked
+
+    private void jLabel6MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
+        pane5.setBackground(paneClick);
+    }//GEN-LAST:event_jLabel6MousePressed
 
     /**
      * @param args the command line arguments

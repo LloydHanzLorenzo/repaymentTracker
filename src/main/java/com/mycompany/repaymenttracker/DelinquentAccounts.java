@@ -30,7 +30,7 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
-        setPreferredSize(new java.awt.Dimension(860, 610));
+        setPreferredSize(new java.awt.Dimension(1260, 610));
 
         jLabel1.setFont(new java.awt.Font("Trebuchet MS", 1, 36)); // NOI18N
         jLabel1.setText("Delinquent Accounts");
