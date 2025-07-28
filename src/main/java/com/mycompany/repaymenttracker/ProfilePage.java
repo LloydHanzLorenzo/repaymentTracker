@@ -4,6 +4,8 @@
  */
 package com.mycompany.repaymenttracker;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author lloyd
@@ -379,7 +381,20 @@ public class ProfilePage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_firstNameTextFieldActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        // TODO add your handling code here:
+        UpdatingInfoSplashScreen splash = new UpdatingInfoSplashScreen(() -> {
+
+        firstNameTextField.setEditable(false);
+        middleNameTextField.setEditable(false);
+        lastNameTextField.setEditable(false);
+        birthdateFormattedTextField.setEditable(false);
+        contactNumberTextField.setEditable(false);
+        nationalityTextField.setEditable(false);
+        homeAddressTextArea.setEditable(false);
+
+        JOptionPane.showMessageDialog(this, "Information has been successfully updated!");
+    });
+
+    splash.setVisible(true);
     }//GEN-LAST:event_updateButtonActionPerformed
 
     private void emailAddressTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailAddressTextFieldActionPerformed
