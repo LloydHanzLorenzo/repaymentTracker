@@ -7,10 +7,12 @@ com\mycompany\repaymenttracker\Borrowers$8.class
 com\mycompany\repaymenttracker\AdminPage$7.class
 com\mycompany\repaymenttracker\ProfilePage$6.class
 com\mycompany\repaymenttracker\Borrowers$1.class
+com\mycompany\repaymenttracker\UserPage$7.class
 com\mycompany\repaymenttracker\Borrowers$13.class
 com\mycompany\repaymenttracker\Borrowers$10.class
 com\mycompany\repaymenttracker\AdminProfilePage$3.class
 com\mycompany\repaymenttracker\ProfilePage$3.class
+com\mycompany\repaymenttracker\SettingPage.class
 com\mycompany\repaymenttracker\RepaymentTracker.class
 com\mycompany\repaymenttracker\AdminPage$9.class
 com\mycompany\repaymenttracker\Borrowers$12.class
@@ -26,6 +28,7 @@ com\mycompany\repaymenttracker\AdminPage.class
 com\mycompany\repaymenttracker\ProfilePage$4.class
 com\mycompany\repaymenttracker\AdminPage$5.class
 com\mycompany\repaymenttracker\Borrowers$3.class
+com\mycompany\repaymenttracker\UserPage$8.class
 com\mycompany\repaymenttracker\DelinquentAccounts.class
 com\mycompany\repaymenttracker\AdminProfilePage$1.class
 com\mycompany\repaymenttracker\UserPage$5.class

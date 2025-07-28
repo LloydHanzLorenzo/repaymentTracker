@@ -8,12 +8,12 @@ package com.mycompany.repaymenttracker;
  *
  * @author lloyd
  */
-public class BorrowMoneyPage extends javax.swing.JInternalFrame {
+public class PayPage extends javax.swing.JInternalFrame {
 
     /**
-     * Creates new form BorrowMoneyPage
+     * Creates new form PayPage
      */
-    public BorrowMoneyPage() {
+    public PayPage() {
         initComponents();
     }
 
@@ -26,32 +26,15 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-
-        setPreferredSize(new java.awt.Dimension(650, 500));
-
-        jPanel1.setPreferredSize(new java.awt.Dimension(650, 500));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 637, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 464, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
+            .addGap(0, 394, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
+            .addGap(0, 274, Short.MAX_VALUE)
         );
 
         pack();
@@ -59,6 +42,5 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }

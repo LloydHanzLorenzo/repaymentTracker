@@ -8,12 +8,12 @@ package com.mycompany.repaymenttracker;
  *
  * @author lloyd
  */
-public class BorrowMoneyPage extends javax.swing.JInternalFrame {
+public class SettingPage extends javax.swing.JInternalFrame {
 
     /**
-     * Creates new form BorrowMoneyPage
+     * Creates new form SettingPage
      */
-    public BorrowMoneyPage() {
+    public SettingPage() {
         initComponents();
     }
 
@@ -30,13 +30,13 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
 
         setPreferredSize(new java.awt.Dimension(650, 500));
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(650, 500));
+        jPanel1.setPreferredSize(new java.awt.Dimension(640, 490));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 637, Short.MAX_VALUE)
+            .addGap(0, 638, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

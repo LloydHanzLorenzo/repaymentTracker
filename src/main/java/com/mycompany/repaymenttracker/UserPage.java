@@ -4,17 +4,27 @@
  */
 package com.mycompany.repaymenttracker;
 
+import java.awt.Color;
+
 /**
  *
  * @author lloyd
  */
 public class UserPage extends javax.swing.JFrame {
+    Color panedefault;
+    Color paneClick;
 
     /**
      * Creates new form UserPage
      */
     public UserPage() {
         initComponents();
+        panedefault = new Color(252, 252, 252);
+        paneClick = new Color(102, 102, 102);
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
     }
 
     /**
@@ -86,6 +96,9 @@ public class UserPage extends javax.swing.JFrame {
             }
         });
 
+        pane1.setBackground(new java.awt.Color(255, 255, 255));
+        pane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
         javax.swing.GroupLayout pane1Layout = new javax.swing.GroupLayout(pane1);
         pane1.setLayout(pane1Layout);
         pane1Layout.setHorizontalGroup(
@@ -122,7 +135,13 @@ public class UserPage extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 payPanelButtonMouseClicked(evt);
             }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                payPanelButtonMousePressed(evt);
+            }
         });
+
+        pane2.setBackground(new java.awt.Color(255, 255, 255));
+        pane2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         javax.swing.GroupLayout pane2Layout = new javax.swing.GroupLayout(pane2);
         pane2.setLayout(pane2Layout);
@@ -156,6 +175,17 @@ public class UserPage extends javax.swing.JFrame {
 
         borrowPanelButton.setBackground(new java.awt.Color(204, 204, 204));
         borrowPanelButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        borrowPanelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                borrowPanelButtonMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                borrowPanelButtonMousePressed(evt);
+            }
+        });
+
+        pane3.setBackground(new java.awt.Color(255, 255, 255));
+        pane3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         javax.swing.GroupLayout pane3Layout = new javax.swing.GroupLayout(pane3);
         pane3.setLayout(pane3Layout);
@@ -191,6 +221,17 @@ public class UserPage extends javax.swing.JFrame {
 
         settingPanelButton.setBackground(new java.awt.Color(204, 204, 204));
         settingPanelButton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        settingPanelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                settingPanelButtonMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                settingPanelButtonMousePressed(evt);
+            }
+        });
+
+        pane4.setBackground(new java.awt.Color(255, 255, 255));
+        pane4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         javax.swing.GroupLayout pane4Layout = new javax.swing.GroupLayout(pane4);
         pane4.setLayout(pane4Layout);
@@ -220,7 +261,7 @@ public class UserPage extends javax.swing.JFrame {
             settingPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(settingPanelButtonLayout.createSequentialGroup()
                 .addComponent(pane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 1, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settingPanelButtonLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -252,13 +293,13 @@ public class UserPage extends javax.swing.JFrame {
             .addGroup(MenuHolderLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addComponent(profilePanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15)
+                .addGap(9, 9, 9)
                 .addComponent(payPanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(borrowPanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(settingPanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 194, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 189, Short.MAX_VALUE)
                 .addComponent(logOutButton)
                 .addGap(43, 43, 43))
         );
@@ -300,7 +341,10 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel3MouseDragged
 
     private void profilePanelButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_profilePanelButtonMousePressed
-        
+        pane1.setBackground(paneClick);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
     }//GEN-LAST:event_profilePanelButtonMousePressed
 
     private void profilePanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_profilePanelButtonMouseClicked
@@ -309,9 +353,40 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_profilePanelButtonMouseClicked
 
     private void payPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMouseClicked
-        BorrowMoneyPage bmp = new BorrowMoneyPage();
-        jDesktopPane1.add(bmp).setVisible(true);
+        PayPage PP = new PayPage();
+        jDesktopPane1.add(PP).setVisible(true);
     }//GEN-LAST:event_payPanelButtonMouseClicked
+
+    private void payPanelButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(paneClick);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
+    }//GEN-LAST:event_payPanelButtonMousePressed
+
+    private void borrowPanelButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_borrowPanelButtonMousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(paneClick);
+        pane4.setBackground(panedefault);
+    }//GEN-LAST:event_borrowPanelButtonMousePressed
+
+    private void settingPanelButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_settingPanelButtonMousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(paneClick);
+    }//GEN-LAST:event_settingPanelButtonMousePressed
+
+    private void settingPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_settingPanelButtonMouseClicked
+        SettingPage ST = new SettingPage();
+        jDesktopPane1.add(ST).setVisible(true);
+    }//GEN-LAST:event_settingPanelButtonMouseClicked
+
+    private void borrowPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_borrowPanelButtonMouseClicked
+        BorrowMoneyPage BMP = new BorrowMoneyPage();
+        jDesktopPane1.add(BMP).setVisible(true);
+    }//GEN-LAST:event_borrowPanelButtonMouseClicked
 
     /**
      * @param args the command line arguments
