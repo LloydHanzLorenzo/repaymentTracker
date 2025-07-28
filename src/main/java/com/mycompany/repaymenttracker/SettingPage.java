@@ -4,12 +4,14 @@
  */
 package com.mycompany.repaymenttracker;
 
+import java.awt.Color;
+
 /**
  *
  * @author lloyd
  */
 public class SettingPage extends javax.swing.JInternalFrame {
-
+    Color originalColor;
     /**
      * Creates new form SettingPage
      */
@@ -27,20 +29,39 @@ public class SettingPage extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        deleteAccountButton = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(650, 500));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(640, 490));
 
+        deleteAccountButton.setText("DELETE ACCOUNT");
+        deleteAccountButton.setBorderPainted(false);
+        deleteAccountButton.setOpaque(true);
+        deleteAccountButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                deleteAccountButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                deleteAccountButtonMouseExited(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 638, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(210, 210, 210)
+                .addComponent(deleteAccountButton, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(217, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 464, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(382, Short.MAX_VALUE)
+                .addComponent(deleteAccountButton)
+                .addGap(59, 59, 59))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -57,8 +78,18 @@ public class SettingPage extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void deleteAccountButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteAccountButtonMouseEntered
+        originalColor = deleteAccountButton.getBackground(); 
+        deleteAccountButton.setBackground(Color.RED);   
+    }//GEN-LAST:event_deleteAccountButtonMouseEntered
+
+    private void deleteAccountButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteAccountButtonMouseExited
+        deleteAccountButton.setBackground(originalColor);
+    }//GEN-LAST:event_deleteAccountButtonMouseExited
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton deleteAccountButton;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
