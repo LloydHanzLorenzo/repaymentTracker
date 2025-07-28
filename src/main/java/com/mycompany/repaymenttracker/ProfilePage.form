@@ -56,34 +56,47 @@
                       <Group type="102" attributes="0">
                           <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="firstNameTextField" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="middleNameTextField" alignment="0" pref="217" max="32767" attributes="0"/>
-                                  <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="contactNumberTextField" alignment="0" pref="217" max="32767" attributes="0"/>
-                                  <Component id="birthdateFormattedTextField" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="lastNameTextField" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="firstNameTextField" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="middleNameTextField" alignment="0" pref="217" max="32767" attributes="0"/>
+                                      <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="contactNumberTextField" alignment="0" pref="217" max="32767" attributes="0"/>
+                                      <Component id="birthdateFormattedTextField" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lastNameTextField" alignment="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="fNameEditButton" min="-2" pref="19" max="-2" attributes="0"/>
+                                      <Component id="mNameEditButton" min="-2" pref="19" max="-2" attributes="0"/>
+                                      <Component id="lNameEditButton" min="-2" pref="19" max="-2" attributes="0"/>
+                                      <Component id="contactNumberEditButton" min="-2" pref="19" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="95" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                              <Component id="emailAddressTextField" pref="217" max="32767" attributes="0"/>
+                              <Component id="nationalityTextField" pref="217" max="32767" attributes="0"/>
+                              <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                              <Component id="jScrollPane1" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                  <Component id="emailAddressTextField" pref="217" max="32767" attributes="0"/>
-                                  <Component id="nationalityTextField" pref="217" max="32767" attributes="0"/>
-                                  <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
+                              <Component id="nationalityEditButton" min="-2" pref="19" max="-2" attributes="0"/>
+                              <Component id="emailAddressEditButton" min="-2" pref="19" max="-2" attributes="0"/>
+                              <Component id="homeAddressEditButton" min="-2" pref="19" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="177" max="-2" attributes="0"/>
-                          <Component id="jButton1" min="-2" pref="277" max="-2" attributes="0"/>
+                          <Component id="updateButton" min="-2" pref="277" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -103,6 +116,8 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="firstNameTextField" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
                       <Component id="nationalityTextField" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                      <Component id="fNameEditButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="nationalityEditButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -113,17 +128,21 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="middleNameTextField" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
                       <Component id="emailAddressTextField" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                      <Component id="mNameEditButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="emailAddressEditButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel8" min="-2" pref="12" max="-2" attributes="0"/>
                       <Component id="jLabel9" alignment="0" min="-2" pref="12" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="lastNameTextField" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="lastNameTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lNameEditButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel6" min="-2" pref="12" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -131,22 +150,23 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel7" min="-2" pref="12" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="contactNumberTextField" min="-2" pref="26" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="contactNumberTextField" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+                              <Component id="contactNumberEditButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                      </Group>
+                      <Component id="jScrollPane1" alignment="0" min="-2" pref="107" max="-2" attributes="0"/>
+                      <Component id="homeAddressEditButton" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jButton1" min="-2" pref="38" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="updateButton" min="-2" pref="38" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="updateButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="UPDATE INFORMATION"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -156,7 +176,7 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateButtonActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
@@ -391,6 +411,83 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Last Name"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="fNameEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="fNameEditButtonMouseClicked"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="mNameEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mNameEditButtonMouseClicked"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lNameEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lNameEditButtonMouseClicked"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="nationalityEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="nationalityEditButtonMouseClicked"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="contactNumberEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="contactNumberEditButtonMouseClicked"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="emailAddressEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="emailAddressEditButtonMouseClicked"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="homeAddressEditButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="jL"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="homeAddressEditButtonMouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

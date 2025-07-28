@@ -15,6 +15,15 @@ public class ProfilePage extends javax.swing.JInternalFrame {
      */
     public ProfilePage() {
         initComponents();
+        
+        firstNameTextField.setEditable(false);
+        middleNameTextField.setEditable(false);
+        lastNameTextField.setEditable(false);
+        birthdateFormattedTextField.setEditable(false);
+        contactNumberTextField.setEditable(false);
+        nationalityTextField.setEditable(false);
+        homeAddressTextArea.setEditable(false);
+
     }
 
     /**
@@ -27,7 +36,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        updateButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         firstNameTextField = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
@@ -48,17 +57,24 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel8 = new javax.swing.JLabel();
         lastNameTextField = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
+        fNameEditButton = new javax.swing.JLabel();
+        mNameEditButton = new javax.swing.JLabel();
+        lNameEditButton = new javax.swing.JLabel();
+        nationalityEditButton = new javax.swing.JLabel();
+        contactNumberEditButton = new javax.swing.JLabel();
+        emailAddressEditButton = new javax.swing.JLabel();
+        homeAddressEditButton = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(650, 500));
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
         jPanel1.setPreferredSize(new java.awt.Dimension(640, 490));
 
-        jButton1.setText("UPDATE INFORMATION");
-        jButton1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        updateButton.setText("UPDATE INFORMATION");
+        updateButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                updateButtonActionPerformed(evt);
             }
         });
 
@@ -185,6 +201,62 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel9.setText("Last Name");
 
+        fNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        fNameEditButton.setText("jL");
+        fNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                fNameEditButtonMouseClicked(evt);
+            }
+        });
+
+        mNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        mNameEditButton.setText("jL");
+        mNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                mNameEditButtonMouseClicked(evt);
+            }
+        });
+
+        lNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        lNameEditButton.setText("jL");
+        lNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lNameEditButtonMouseClicked(evt);
+            }
+        });
+
+        nationalityEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        nationalityEditButton.setText("jL");
+        nationalityEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                nationalityEditButtonMouseClicked(evt);
+            }
+        });
+
+        contactNumberEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        contactNumberEditButton.setText("jL");
+        contactNumberEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                contactNumberEditButtonMouseClicked(evt);
+            }
+        });
+
+        emailAddressEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        emailAddressEditButton.setText("jL");
+        emailAddressEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                emailAddressEditButtonMouseClicked(evt);
+            }
+        });
+
+        homeAddressEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        homeAddressEditButton.setText("jL");
+        homeAddressEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                homeAddressEditButtonMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -195,29 +267,40 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(50, 50, 50)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel1)
-                                .addComponent(firstNameTextField)
-                                .addComponent(middleNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel6)
-                                .addComponent(contactNumberTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                                .addComponent(birthdateFormattedTextField)
-                                .addComponent(jLabel7)
-                                .addComponent(lastNameTextField))
-                            .addComponent(jLabel9))
-                        .addGap(95, 95, 95)
+                            .addComponent(jLabel9)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel1)
+                                    .addComponent(firstNameTextField)
+                                    .addComponent(middleNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel6)
+                                    .addComponent(contactNumberTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                                    .addComponent(birthdateFormattedTextField)
+                                    .addComponent(jLabel7)
+                                    .addComponent(lastNameTextField))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(fNameEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(mNameEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lNameEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(contactNumberEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(71, 71, 71)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel4)
+                            .addComponent(emailAddressTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                            .addComponent(nationalityTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel8)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel4)
-                                .addComponent(emailAddressTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                                .addComponent(nationalityTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                                .addComponent(jLabel5)
-                                .addComponent(jLabel8))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(nationalityEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(emailAddressEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(homeAddressEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(177, 177, 177)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -231,7 +314,9 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(firstNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(nationalityTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(nationalityTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fNameEditButton)
+                    .addComponent(nationalityEditButton))
                 .addGap(12, 12, 12)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -239,16 +324,19 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(middleNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(emailAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(emailAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(mNameEditButton)
+                    .addComponent(emailAddressEditButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(lastNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lastNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lNameEditButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -256,12 +344,13 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(contactNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(contactNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(contactNumberEditButton)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(homeAddressEditButton))
+                .addGap(30, 30, 30)
+                .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28))
         );
 
@@ -289,9 +378,9 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_firstNameTextFieldActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_updateButtonActionPerformed
 
     private void emailAddressTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailAddressTextFieldActionPerformed
         // TODO add your handling code here:
@@ -317,15 +406,53 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_birthdateFormattedTextFieldActionPerformed
 
+    private void fNameEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fNameEditButtonMouseClicked
+        firstNameTextField.setEditable(true);
+        firstNameTextField.requestFocus(); 
+    }//GEN-LAST:event_fNameEditButtonMouseClicked
+
+    private void mNameEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mNameEditButtonMouseClicked
+        middleNameTextField.setEditable(true);
+        middleNameTextField.requestFocus(); 
+    }//GEN-LAST:event_mNameEditButtonMouseClicked
+
+    private void lNameEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lNameEditButtonMouseClicked
+        lastNameTextField.setEditable(true);
+        lastNameTextField.requestFocus(); 
+    }//GEN-LAST:event_lNameEditButtonMouseClicked
+
+    private void contactNumberEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_contactNumberEditButtonMouseClicked
+        contactNumberTextField.setEditable(true);
+        contactNumberTextField.requestFocus(); 
+    }//GEN-LAST:event_contactNumberEditButtonMouseClicked
+
+    private void nationalityEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nationalityEditButtonMouseClicked
+        nationalityTextField.setEditable(true);
+        nationalityTextField.requestFocus(); 
+    }//GEN-LAST:event_nationalityEditButtonMouseClicked
+
+    private void emailAddressEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_emailAddressEditButtonMouseClicked
+        emailAddressTextField.setEditable(true);
+        emailAddressTextField.requestFocus(); 
+    }//GEN-LAST:event_emailAddressEditButtonMouseClicked
+
+    private void homeAddressEditButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homeAddressEditButtonMouseClicked
+        homeAddressTextArea.setEditable(true);
+        homeAddressTextArea.requestFocus(); 
+    }//GEN-LAST:event_homeAddressEditButtonMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField birthdateFormattedTextField;
     private javax.swing.JTextField contactNumberDisplayField;
+    private javax.swing.JLabel contactNumberEditButton;
     private javax.swing.JTextField contactNumberTextField;
+    private javax.swing.JLabel emailAddressEditButton;
     private javax.swing.JTextField emailAddressTextField;
+    private javax.swing.JLabel fNameEditButton;
     private javax.swing.JTextField firstNameTextField;
+    private javax.swing.JLabel homeAddressEditButton;
     private javax.swing.JTextArea homeAddressTextArea;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -337,9 +464,13 @@ public class ProfilePage extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lNameEditButton;
     private javax.swing.JTextField lastNameTextField;
+    private javax.swing.JLabel mNameEditButton;
     private javax.swing.JTextField middleNameTextField;
+    private javax.swing.JLabel nationalityEditButton;
     private javax.swing.JTextField nationalityTextField;
+    private javax.swing.JButton updateButton;
     private javax.swing.JTextField userNameDisplayField;
     // End of variables declaration//GEN-END:variables
 }
