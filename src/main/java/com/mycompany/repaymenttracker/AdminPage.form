@@ -99,6 +99,11 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                  <Component id="logOutButton" min="-2" pref="182" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -114,7 +119,9 @@
                   <Component id="jPanel10" min="-2" pref="46" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel12" min="-2" pref="46" max="-2" attributes="0"/>
-                  <EmptySpace pref="328" max="32767" attributes="0"/>
+                  <EmptySpace pref="271" max="32767" attributes="0"/>
+                  <Component id="logOutButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -170,9 +177,6 @@
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                </Property>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\user.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Account"/>
               </Properties>
@@ -243,9 +247,6 @@
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                </Property>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\calendar.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Repayment Calendar"/>
               </Properties>
@@ -322,9 +323,6 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\borrower.png"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="Borrowers"/>
               </Properties>
               <Events>
@@ -399,9 +397,6 @@
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                </Property>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\delinquent.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Delinquent Accounts"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -479,9 +474,6 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\algorithm.png"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="Algorithm"/>
               </Properties>
               <Events>
@@ -506,6 +498,14 @@
             </Container>
           </SubComponents>
         </Container>
+        <Component class="javax.swing.JButton" name="logOutButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Log Out"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="logOutButtonActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JDesktopPane" name="jDesktopPane1">
