@@ -283,15 +283,16 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
                         .addGap(33, 33, 33)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnSearch)
-                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel19)
-                            .addComponent(btnLoad)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jButton3)
                                 .addComponent(jButton1)
-                                .addComponent(jButton2)))))
+                                .addComponent(jButton2))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnSearch)
+                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel19)
+                                .addComponent(btnLoad)))))
                 .addContainerGap(74, Short.MAX_VALUE))
         );
 
@@ -383,7 +384,7 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
                 });
             }
 
-            tblBorrowers.setModel(model);
+            //tblBorrowers.setModel(model);
             conn.close();
 
         } catch (Exception e) {
@@ -394,44 +395,7 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
 
     private void btnLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadActionPerformed
         // TODO add your handling code here:
-        try {
-            // Connect to MySQL
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/borrowerdb", "root",
-                "");
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM borrowers");
-            DefaultTableModel model = (DefaultTableModel)
-            tblBorrowers.getModel();
-            model.setRowCount(0); // Clear existing rows
-
-            while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getInt("id"),
-                    rs.getString("full_name"),
-                    rs.getDate("birthdate"),
-                    rs.getString("id_number"),
-                    rs.getString("email"),
-                    rs.getString("phone"),
-                    rs.getString("address"),
-                    rs.getString("employment_status"),
-                    rs.getBigDecimal("monthly_income"),
-                    rs.getBigDecimal("existing_debt"),
-                    rs.getBigDecimal("loan_amount"),
-                    rs.getString("loan_purpose"),
-                    rs.getString("loan_status"),
-                    rs.getTimestamp("application_date"),
-                    rs.getTimestamp("approval_date"),
-                    rs.getInt("repayment_term"),
-                    rs.getBigDecimal("interest_rate"),
-                    rs.getString("notes")
-                });
-            }
-
-            conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+     
     }//GEN-LAST:event_btnLoadActionPerformed
 
 

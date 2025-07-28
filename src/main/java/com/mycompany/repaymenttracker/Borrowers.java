@@ -128,8 +128,10 @@ public class Borrowers extends javax.swing.JInternalFrame {
         btnSearch = new javax.swing.JButton();
         btnLoad = new javax.swing.JButton();
 
+        setPreferredSize(new java.awt.Dimension(1260, 610));
+
         jPanel1.setBackground(new java.awt.Color(0, 204, 204));
-        jPanel1.setPreferredSize(new java.awt.Dimension(860, 610));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1260, 610));
 
         jLabel1.setFont(new java.awt.Font("Trebuchet MS", 1, 36)); // NOI18N
         jLabel1.setText("Borrower Records");
@@ -459,7 +461,9 @@ public class Borrowers extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1260, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
