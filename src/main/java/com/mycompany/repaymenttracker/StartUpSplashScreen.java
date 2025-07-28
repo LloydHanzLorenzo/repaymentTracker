@@ -23,14 +23,14 @@ public class StartUpSplashScreen extends javax.swing.JFrame {
             try {
                 Thread.sleep(3000);
                 java.awt.EventQueue.invokeLater(() -> {
-                    new LogInPage().setVisible(true);
+                    new MenuPage().setVisible(true);
                     dispose();
                 });
             } catch (InterruptedException e) {
                 System.err.println("Splash screen thread interrupted: " + e.getMessage());
                 // Open main window anyway if splash fails
                 java.awt.EventQueue.invokeLater(() -> {
-                    new LogInPage().setVisible(true);
+                    new MenuPage().setVisible(true);
                     dispose();
                 });
             }
@@ -105,6 +105,7 @@ public class StartUpSplashScreen extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     /**
