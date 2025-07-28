@@ -112,6 +112,14 @@ public class UserPage extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel2.setText("Account");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel2MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout profilePanelButtonLayout = new javax.swing.GroupLayout(profilePanelButton);
         profilePanelButton.setLayout(profilePanelButtonLayout);
@@ -156,6 +164,17 @@ public class UserPage extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel4.setText("Pay Loan");
+        jLabel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel4MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel4MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jLabel4MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout payPanelButtonLayout = new javax.swing.GroupLayout(payPanelButton);
         payPanelButton.setLayout(payPanelButtonLayout);
@@ -200,6 +219,14 @@ public class UserPage extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel5.setText("Borrow Money");
+        jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel5MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel5MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout borrowPanelButtonLayout = new javax.swing.GroupLayout(borrowPanelButton);
         borrowPanelButton.setLayout(borrowPanelButtonLayout);
@@ -246,6 +273,14 @@ public class UserPage extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel1.setText("Setting");
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel1MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout settingPanelButtonLayout = new javax.swing.GroupLayout(settingPanelButton);
         settingPanelButton.setLayout(settingPanelButtonLayout);
@@ -348,11 +383,13 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_profilePanelButtonMousePressed
 
     private void profilePanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_profilePanelButtonMouseClicked
+        jDesktopPane1.removeAll();
         ProfilePage profile = new ProfilePage();
         jDesktopPane1.add(profile).setVisible(true);
     }//GEN-LAST:event_profilePanelButtonMouseClicked
 
     private void payPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMouseClicked
+        jDesktopPane1.removeAll();
         PayPage PP = new PayPage();
         jDesktopPane1.add(PP).setVisible(true);
     }//GEN-LAST:event_payPanelButtonMouseClicked
@@ -379,14 +416,72 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_settingPanelButtonMousePressed
 
     private void settingPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_settingPanelButtonMouseClicked
+        jDesktopPane1.removeAll();
         SettingPage ST = new SettingPage();
         jDesktopPane1.add(ST).setVisible(true);
     }//GEN-LAST:event_settingPanelButtonMouseClicked
 
     private void borrowPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_borrowPanelButtonMouseClicked
+        jDesktopPane1.removeAll();
         BorrowMoneyPage BMP = new BorrowMoneyPage();
         jDesktopPane1.add(BMP).setVisible(true);
     }//GEN-LAST:event_borrowPanelButtonMouseClicked
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        jDesktopPane1.removeAll();
+        ProfilePage profile = new ProfilePage();
+        jDesktopPane1.add(profile).setVisible(true);
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
+        jDesktopPane1.removeAll();
+        PayPage PP = new PayPage();
+        jDesktopPane1.add(PP).setVisible(true);
+    }//GEN-LAST:event_jLabel4MouseClicked
+
+    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
+        jDesktopPane1.removeAll();
+        BorrowMoneyPage BMP = new BorrowMoneyPage();
+        jDesktopPane1.add(BMP).setVisible(true);
+    }//GEN-LAST:event_jLabel5MouseClicked
+
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+        jDesktopPane1.removeAll();
+        SettingPage ST = new SettingPage();
+        jDesktopPane1.add(ST).setVisible(true);
+    }//GEN-LAST:event_jLabel1MouseClicked
+
+    private void jLabel2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MousePressed
+        pane1.setBackground(paneClick);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel2MousePressed
+
+    private void jLabel4MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseReleased
+        //do not do anything here, wrong pressed
+    }//GEN-LAST:event_jLabel4MouseReleased
+
+    private void jLabel4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(paneClick);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel4MousePressed
+
+    private void jLabel5MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(paneClick);
+        pane4.setBackground(panedefault);
+    }//GEN-LAST:event_jLabel5MousePressed
+
+    private void jLabel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MousePressed
+        pane1.setBackground(panedefault);
+        pane2.setBackground(panedefault);
+        pane3.setBackground(panedefault);
+        pane4.setBackground(paneClick);
+    }//GEN-LAST:event_jLabel1MousePressed
 
     /**
      * @param args the command line arguments
