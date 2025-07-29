@@ -4,11 +4,14 @@
  */
 package com.mycompany.repaymenttracker;
 
+import java.awt.Color;
+
 /**
  *
  * @author lloyd
  */
 public class LogInPage extends javax.swing.JFrame {
+    Color originalColor;
 
     /**
      * Creates new form LogInPage
@@ -34,6 +37,7 @@ public class LogInPage extends javax.swing.JFrame {
         emailTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         passwordTextField = new javax.swing.JTextField();
+        createAccountButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(520, 400));
@@ -73,6 +77,26 @@ public class LogInPage extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Password:");
 
+        createAccountButton.setBackground(new java.awt.Color(102, 102, 102));
+        createAccountButton.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        createAccountButton.setForeground(new java.awt.Color(255, 255, 255));
+        createAccountButton.setText("Create Account");
+        createAccountButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        createAccountButton.setBorderPainted(false);
+        createAccountButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                createAccountButtonMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                createAccountButtonMouseExited(evt);
+            }
+        });
+        createAccountButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createAccountButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -81,6 +105,7 @@ public class LogInPage extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(109, 109, 109)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(createAccountButton, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1)
                     .addComponent(emailTextField)
@@ -103,7 +128,9 @@ public class LogInPage extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(createAccountButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(logInButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(logInBackButton, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -129,6 +156,20 @@ public class LogInPage extends javax.swing.JFrame {
         new MenuPage().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_logInBackButtonActionPerformed
+
+    private void createAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createAccountButtonActionPerformed
+        new SignUpPage().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_createAccountButtonActionPerformed
+
+    private void createAccountButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createAccountButtonMouseEntered
+        originalColor = createAccountButton.getBackground(); 
+        createAccountButton.setBackground(Color.BLUE);   
+    }//GEN-LAST:event_createAccountButtonMouseEntered
+
+    private void createAccountButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createAccountButtonMouseExited
+        createAccountButton.setBackground(originalColor);
+    }//GEN-LAST:event_createAccountButtonMouseExited
 
     /**
      * @param args the command line arguments
@@ -166,6 +207,7 @@ public class LogInPage extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton createAccountButton;
     private javax.swing.JTextField emailTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
