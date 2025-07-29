@@ -24,10 +24,11 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         birthdateFormattedTextField.setEditable(false);
         contactNumberTextField.setEditable(false);
         nationalityTextField.setEditable(false);
+        emailAddressTextField.setEditable(false);
         employmentStatusComboBox.setEditable(false);
         employmentStatusComboBox.setEnabled(false);
+        validIdTextField.setEditable(false);
         homeAddressTextArea.setEditable(false);
-
     }
 
     /**
