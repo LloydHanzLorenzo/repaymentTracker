@@ -114,7 +114,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
 
         contactNumberDisplayField.setEditable(false);
         contactNumberDisplayField.setBackground(new java.awt.Color(102, 102, 102));
-        contactNumberDisplayField.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        contactNumberDisplayField.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         contactNumberDisplayField.setForeground(new java.awt.Color(255, 255, 255));
         contactNumberDisplayField.setText("(contact Number should be here)");
         contactNumberDisplayField.setBorder(null);
@@ -153,9 +153,9 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addGap(24, 24, 24)
                 .addComponent(userNameDisplayField, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(contactNumberDisplayField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
@@ -226,7 +226,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel9.setText("Last Name");
 
-        fNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         fNameEditButton.setText("jL");
         fNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -234,7 +233,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        mNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         mNameEditButton.setText("jL");
         mNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -242,7 +240,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        lNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         lNameEditButton.setText("jL");
         lNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -250,7 +247,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        nationalityEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         nationalityEditButton.setText("jL");
         nationalityEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -258,7 +254,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        contactNumberEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         contactNumberEditButton.setText("jL");
         contactNumberEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -266,7 +261,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        emailAddressEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         emailAddressEditButton.setText("jL");
         emailAddressEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -274,7 +268,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        homeAddressEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         homeAddressEditButton.setText("jL");
         homeAddressEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -285,7 +278,6 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel10.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel10.setText("Employment Status");
 
-        employmentStatusEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
         employmentStatusEditButton.setText("jL");
         employmentStatusEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -419,7 +411,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                             .addComponent(contactNumberEditButton))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(updateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

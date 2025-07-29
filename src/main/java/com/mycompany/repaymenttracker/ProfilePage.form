@@ -207,7 +207,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="updateButton" min="-2" pref="27" max="-2" attributes="0"/>
-                  <EmptySpace pref="18" max="32767" attributes="0"/>
+                  <EmptySpace pref="20" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -280,9 +280,9 @@
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                       <Component id="userNameDisplayField" min="-2" pref="32" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="contactNumberDisplayField" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
@@ -323,7 +323,7 @@
                   <Color blue="66" green="66" red="66" type="rgb"/>
                 </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Segoe UI" size="10" style="1"/>
+                  <Font name="Segoe UI" size="12" style="1"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -484,9 +484,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="fNameEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -495,9 +492,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="mNameEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -506,9 +500,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="lNameEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -517,9 +508,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="nationalityEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -528,9 +516,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="contactNumberEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -539,9 +524,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="emailAddressEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -550,9 +532,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="homeAddressEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
@@ -569,9 +548,6 @@
         </Component>
         <Component class="javax.swing.JLabel" name="employmentStatusEditButton">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
-            </Property>
             <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
