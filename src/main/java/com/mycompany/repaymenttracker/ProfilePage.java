@@ -4,6 +4,10 @@
  */
 package com.mycompany.repaymenttracker;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 
 /**
@@ -11,13 +15,15 @@ import javax.swing.JOptionPane;
  * @author lloyd
  */
 public class ProfilePage extends javax.swing.JInternalFrame {
-
+     private int userId;
     /**
      * Creates new form ProfilePage
      */
-    public ProfilePage() {
+    public ProfilePage(int userId) {
         initComponents();
+        this.userId = userId;
         
+        fetchBorrowerDetails(userId);
         firstNameTextField.setEditable(false);
         middleNameTextField.setEditable(false);
         lastNameTextField.setEditable(false);
@@ -30,7 +36,33 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         validIdTextField.setEditable(false);
         homeAddressTextArea.setEditable(false);
     }
+   private void fetchBorrowerDetails(int userId) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database", "root", "");
+            String query = "SELECT * FROM borrowers WHERE user_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
 
+            if (rs.next()) {
+                firstNameTextField.setText(rs.getString("first_name"));
+                middleNameTextField.setText(rs.getString("middle_name"));
+                lastNameTextField.setText(rs.getString("last_name"));
+                birthdateFormattedTextField.setText(rs.getString("birthdate"));
+                contactNumberTextField.setText(rs.getString("contact_number"));
+                nationalityTextField.setText(rs.getString("nationality"));
+                emailAddressTextField.setText(rs.getString("email_address"));
+                employmentStatusComboBox.setSelectedItem(rs.getString("employment_status"));
+                validIdTextField.setText(rs.getString("valid_id"));
+                homeAddressTextArea.setText(rs.getString("address"));
+            }
+
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+  
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

@@ -5,6 +5,10 @@
 package com.mycompany.repaymenttracker;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  *
@@ -13,12 +17,14 @@ import java.awt.Color;
 public class UserPage extends javax.swing.JFrame {
     Color panedefault;
     Color paneClick;
-
+    private int userId;
     /**
      * Creates new form UserPage
      */
-    public UserPage() {
+    public UserPage(int userId) {
         initComponents();
+        this.userId = userId;
+        
         panedefault = new Color(252, 252, 252);
         paneClick = new Color(153, 255, 255);
         pane1.setBackground(panedefault);
@@ -26,6 +32,8 @@ public class UserPage extends javax.swing.JFrame {
         pane3.setBackground(panedefault);
         pane4.setBackground(panedefault);
     }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -391,9 +399,12 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_profilePanelButtonMousePressed
 
     private void profilePanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_profilePanelButtonMouseClicked
-        jDesktopPane1.removeAll();
-        ProfilePage profile = new ProfilePage();
-        jDesktopPane1.add(profile).setVisible(true);
+        jDesktopPane1.removeAll(); 
+        jDesktopPane1.repaint(); 
+
+        ProfilePage profile = new ProfilePage(this.userId);
+        jDesktopPane1.add(profile);
+        profile.setVisible(true); 
     }//GEN-LAST:event_profilePanelButtonMouseClicked
 
     private void payPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMouseClicked
@@ -437,7 +448,7 @@ public class UserPage extends javax.swing.JFrame {
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         jDesktopPane1.removeAll();
-        ProfilePage profile = new ProfilePage();
+        ProfilePage profile = new ProfilePage(this.userId);
         jDesktopPane1.add(profile).setVisible(true);
     }//GEN-LAST:event_jLabel2MouseClicked
 
@@ -519,11 +530,7 @@ public class UserPage extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new UserPage().setVisible(true);
-            }
-        });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

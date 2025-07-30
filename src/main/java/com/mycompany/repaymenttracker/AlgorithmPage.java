@@ -27,18 +27,44 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        interestRateUpdateButton = new javax.swing.JButton();
+        usersidebutton = new javax.swing.JButton();
 
         jPanel1.setPreferredSize(new java.awt.Dimension(1250, 610));
+
+        interestRateUpdateButton.setText("Update Interest Rate");
+        interestRateUpdateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                interestRateUpdateButtonActionPerformed(evt);
+            }
+        });
+
+        usersidebutton.setText("Go to user Side first");
+        usersidebutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usersidebuttonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1248, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(370, 370, 370)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(usersidebutton)
+                    .addComponent(interestRateUpdateButton))
+                .addContainerGap(739, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 614, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(223, Short.MAX_VALUE)
+                .addComponent(usersidebutton)
+                .addGap(52, 52, 52)
+                .addComponent(interestRateUpdateButton)
+                .addGap(293, 293, 293))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -55,8 +81,18 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void usersidebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usersidebuttonActionPerformed
+
+    }//GEN-LAST:event_usersidebuttonActionPerformed
+
+    private void interestRateUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_interestRateUpdateButtonActionPerformed
+       
+    }//GEN-LAST:event_interestRateUpdateButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton interestRateUpdateButton;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton usersidebutton;
     // End of variables declaration//GEN-END:variables
 }

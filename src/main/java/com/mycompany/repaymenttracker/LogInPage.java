@@ -5,6 +5,14 @@
 package com.mycompany.repaymenttracker;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -36,11 +44,10 @@ public class LogInPage extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         emailTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        passwordTextField = new javax.swing.JTextField();
         createAccountButton = new javax.swing.JButton();
+        passwordTextField = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(756, 480));
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
 
@@ -60,6 +67,11 @@ public class LogInPage extends javax.swing.JFrame {
 
         logInButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         logInButton.setText("Log In");
+        logInButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logInButtonActionPerformed(evt);
+            }
+        });
 
         logInBackButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         logInBackButton.setText("Back");
@@ -72,6 +84,12 @@ public class LogInPage extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Email:");
+
+        emailTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailTextFieldActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -104,17 +122,16 @@ public class LogInPage extends javax.swing.JFrame {
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(193, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel2)
-                        .addComponent(passwordTextField)
-                        .addComponent(createAccountButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                            .addComponent(logInButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(127, 127, 127)
-                            .addComponent(logInBackButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(emailTextField)))
+                    .addComponent(jLabel2)
+                    .addComponent(createAccountButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(logInButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(127, 127, 127)
+                        .addComponent(logInBackButton, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(emailTextField)
+                    .addComponent(passwordTextField))
                 .addGap(198, 198, 198))
         );
         jPanel1Layout.setVerticalGroup(
@@ -129,7 +146,7 @@ public class LogInPage extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(12, 12, 12)
                 .addComponent(createAccountButton)
                 .addGap(57, 57, 57)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -171,6 +188,58 @@ public class LogInPage extends javax.swing.JFrame {
     private void createAccountButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createAccountButtonMouseExited
         createAccountButton.setBackground(originalColor);
     }//GEN-LAST:event_createAccountButtonMouseExited
+
+    private void logInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInButtonActionPerformed
+            {
+            String email = emailTextField.getText();
+            String password = new String(passwordTextField.getPassword());
+
+            try {
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/borrowerdb", "root", "");
+                String query = "SELECT * FROM users WHERE email = ? AND password = ?";
+                PreparedStatement ps = con.prepareStatement(query);
+                ps.setString(1, email);
+                ps.setString(2, password); 
+
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    String role = rs.getString("role");
+                    int userId = rs.getInt("user_id");
+
+                    if ("user".equalsIgnoreCase(role)) {
+                        java.awt.EventQueue.invokeLater(new Runnable() {
+                            public void run() {
+                                new UserPage(userId).setVisible(true);
+                            }
+                        });
+                        this.dispose();
+                    } else if ("admin".equalsIgnoreCase(role)) {
+                        java.awt.EventQueue.invokeLater(new Runnable() {
+                            public void run() {
+                                new AdminPage().setVisible(true);
+                            }
+                        });
+                        this.dispose();
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Invalid email or password.");
+                }
+
+                rs.close();
+                ps.close();
+                con.close();
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_logInButtonActionPerformed
+
+    private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_emailTextFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -216,6 +285,6 @@ public class LogInPage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton logInBackButton;
     private javax.swing.JButton logInButton;
-    private javax.swing.JTextField passwordTextField;
+    private javax.swing.JPasswordField passwordTextField;
     // End of variables declaration//GEN-END:variables
 }
