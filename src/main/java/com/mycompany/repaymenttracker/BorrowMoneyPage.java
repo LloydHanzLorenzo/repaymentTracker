@@ -283,27 +283,7 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_loanAmountTextFieldKeyReleased
 
     private void repaymentTermComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_repaymentTermComboBoxActionPerformed
-        String selectedTermStr = (String) repaymentTermComboBox.getSelectedItem();
-        if (selectedTermStr != null && !selectedTermStr.isEmpty()) {
-            int selectedTerm = Integer.parseInt(selectedTermStr);
 
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/borrowerdb", "root", "");
-                 PreparedStatement pst = conn.prepareStatement("SELECT interest_rate FROM interest_rates WHERE term_months = ?")) {
-
-                pst.setInt(1, selectedTerm);
-                ResultSet rs = pst.executeQuery();
-
-                if (rs.next()) {
-                    double interest = rs.getDouble("interest_rate");
-                    interestRateTextField.setText(String.format("%.2f", interest));
-                } else {
-                    interestRateTextField.setText("N/A");
-                }
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
     }//GEN-LAST:event_repaymentTermComboBoxActionPerformed
 
     private void applicationDateFormattedTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_applicationDateFormattedTextFieldKeyReleased

@@ -17,13 +17,11 @@ import java.sql.ResultSet;
 public class UserPage extends javax.swing.JFrame {
     Color panedefault;
     Color paneClick;
-    private int userId;
     /**
      * Creates new form UserPage
      */
-    public UserPage(int userId) {
+    public UserPage() {
         initComponents();
-        this.userId = userId;
         
         panedefault = new Color(252, 252, 252);
         paneClick = new Color(153, 255, 255);
@@ -399,10 +397,8 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_profilePanelButtonMousePressed
 
     private void profilePanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_profilePanelButtonMouseClicked
-        jDesktopPane1.removeAll(); 
-        jDesktopPane1.repaint(); 
 
-        ProfilePage profile = new ProfilePage(this.userId);
+        ProfilePage profile = new ProfilePage();
         jDesktopPane1.add(profile);
         profile.setVisible(true); 
     }//GEN-LAST:event_profilePanelButtonMouseClicked
@@ -448,7 +444,7 @@ public class UserPage extends javax.swing.JFrame {
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         jDesktopPane1.removeAll();
-        ProfilePage profile = new ProfilePage(this.userId);
+        ProfilePage profile = new ProfilePage();
         jDesktopPane1.add(profile).setVisible(true);
     }//GEN-LAST:event_jLabel2MouseClicked
 
@@ -530,6 +526,11 @@ public class UserPage extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new UserPage().setVisible(true);
+            }
+        });
 
     }
 

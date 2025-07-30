@@ -190,51 +190,7 @@ public class LogInPage extends javax.swing.JFrame {
     }//GEN-LAST:event_createAccountButtonMouseExited
 
     private void logInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInButtonActionPerformed
-            {
-            String email = emailTextField.getText();
-            String password = new String(passwordTextField.getPassword());
 
-            try {
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/borrowerdb", "root", "");
-                String query = "SELECT * FROM users WHERE email = ? AND password = ?";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.setString(1, email);
-                ps.setString(2, password); 
-
-                ResultSet rs = ps.executeQuery();
-
-                if (rs.next()) {
-                    String role = rs.getString("role");
-                    int userId = rs.getInt("user_id");
-
-                    if ("user".equalsIgnoreCase(role)) {
-                        java.awt.EventQueue.invokeLater(new Runnable() {
-                            public void run() {
-                                new UserPage(userId).setVisible(true);
-                            }
-                        });
-                        this.dispose();
-                    } else if ("admin".equalsIgnoreCase(role)) {
-                        java.awt.EventQueue.invokeLater(new Runnable() {
-                            public void run() {
-                                new AdminPage().setVisible(true);
-                            }
-                        });
-                        this.dispose();
-                    }
-
-                } else {
-                    JOptionPane.showMessageDialog(this, "Invalid email or password.");
-                }
-
-                rs.close();
-                ps.close();
-                con.close();
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
     }//GEN-LAST:event_logInButtonActionPerformed
 
     private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed
