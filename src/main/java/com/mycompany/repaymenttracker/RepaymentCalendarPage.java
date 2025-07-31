@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 
 public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
 
@@ -34,11 +39,43 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
     
     private List<Date> getDelinquentDates() {
         List<Date> dates = new ArrayList<>();
-        dates.add(createDate(14)); // Sample: 14th of current month
-        dates.add(createDate(15)); // Sample: 15th of current month
+
+        // Database credentials (replace these placeholders later)
+        String url = "jdbc:mysql://localhost:3306/your_database_name";
+        String user = "your_username";
+        String password = "your_password";
+
+        // Example SQL query - modify this once your schema is ready
+        String sql = "SELECT due_date FROM repayments WHERE status = 'delinquent'";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Date dueDate = rs.getDate("due_date"); // SQL Date
+                if (dueDate != null) {
+                    dates.add(zeroTime(dueDate));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Log error or show dialog in production
+        }
+
         return dates;
     }
     
+    private Date zeroTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
     private Date createDate(int day) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, day);
@@ -118,11 +155,11 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         jPanel4 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        accountListComboBox = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        amountDueField = new javax.swing.JTextField();
+        paymentDeadlineField = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1260, 610));
@@ -220,10 +257,10 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel2.setText("User Account:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        accountListComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        accountListComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                accountListComboBoxActionPerformed(evt);
             }
         });
 
@@ -234,21 +271,21 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel4.setText("Amount Due:");
 
-        jTextField1.setEditable(false);
-        jTextField1.setFont(new java.awt.Font("Nirmala UI", 0, 18)); // NOI18N
-        jTextField1.setText("(Display amount to pay here)");
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        amountDueField.setEditable(false);
+        amountDueField.setFont(new java.awt.Font("Nirmala UI", 0, 18)); // NOI18N
+        amountDueField.setText("(Display amount to pay here)");
+        amountDueField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                amountDueFieldActionPerformed(evt);
             }
         });
 
-        jTextField2.setEditable(false);
-        jTextField2.setFont(new java.awt.Font("Nirmala UI", 0, 18)); // NOI18N
-        jTextField2.setText("(Display amount to pay here)");
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        paymentDeadlineField.setEditable(false);
+        paymentDeadlineField.setFont(new java.awt.Font("Nirmala UI", 0, 18)); // NOI18N
+        paymentDeadlineField.setText("(Display amount to pay here)");
+        paymentDeadlineField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                paymentDeadlineFieldActionPerformed(evt);
             }
         });
 
@@ -268,7 +305,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(accountListComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -276,10 +313,10 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
+                                .addComponent(paymentDeadlineField, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
-                                .addComponent(jTextField1)))))
+                                .addComponent(amountDueField)))))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -289,18 +326,18 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(accountListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(46, 46, 46)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2))
+                    .addComponent(paymentDeadlineField))
                 .addGap(46, 46, 46)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1))
-                .addGap(159, 159, 159))
+                    .addComponent(amountDueField))
+                .addGap(162, 162, 162))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -342,22 +379,23 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void accountListComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accountListComboBoxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_accountListComboBoxActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void amountDueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amountDueFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_amountDueFieldActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void paymentDeadlineFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentDeadlineFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_paymentDeadlineFieldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> accountListComboBox;
+    private javax.swing.JTextField amountDueField;
     private com.toedter.calendar.JCalendar jCalendar1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -371,8 +409,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField paymentDeadlineField;
     // End of variables declaration//GEN-END:variables
 
 }
