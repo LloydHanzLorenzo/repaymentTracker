@@ -73,7 +73,7 @@ public class MenuPage extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\Logo_Repay_Right__1_-removebg-preview.png")); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Logo_Repay_Right__1_-removebg-preview.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);

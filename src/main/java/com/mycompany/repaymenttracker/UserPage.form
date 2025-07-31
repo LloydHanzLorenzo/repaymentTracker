@@ -178,7 +178,7 @@
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\user.png"/>
+                  <Image iconType="3" name="/images/user.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Account"/>
               </Properties>
@@ -258,7 +258,7 @@
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\borrower.png"/>
+                  <Image iconType="3" name="/images/borrower.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Pay Loan"/>
               </Properties>
@@ -342,7 +342,7 @@
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\borrower.png"/>
+                  <Image iconType="3" name="/images/borrower.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Borrow Money"/>
               </Properties>
@@ -429,7 +429,7 @@
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\algorithm.png"/>
+                  <Image iconType="3" name="/images/algorithm.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Setting"/>
               </Properties>
