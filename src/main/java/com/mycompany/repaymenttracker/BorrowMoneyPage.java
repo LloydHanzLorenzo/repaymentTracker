@@ -178,6 +178,11 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Monthly Income");
 
+        applicationDateFormattedTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                applicationDateFormattedTextFieldActionPerformed(evt);
+            }
+        });
         applicationDateFormattedTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 applicationDateFormattedTextFieldKeyReleased(evt);
@@ -290,10 +295,7 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void applyButtonLoanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonLoanActionPerformed
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        applicationDateFormattedTextField.setText(formattedDate);
+
     }//GEN-LAST:event_applyButtonLoanActionPerformed
 
     private void loanAmountTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_loanAmountTextFieldKeyReleased
@@ -331,7 +333,13 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
 
         } catch (Exception e) {
             interestRateTextField.setText("Invalid input");
+            
         }
+       
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = today.format(formatter);
+        applicationDateFormattedTextField.setText(formattedDate);
     }//GEN-LAST:event_loanAmountTextFieldKeyReleased
 
     private void repaymentTermComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_repaymentTermComboBoxActionPerformed
@@ -339,11 +347,12 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_repaymentTermComboBoxActionPerformed
 
     private void applicationDateFormattedTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_applicationDateFormattedTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        applicationDateFormattedTextField.setText(formattedDate);
+
     }//GEN-LAST:event_applicationDateFormattedTextFieldKeyReleased
+
+    private void applicationDateFormattedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applicationDateFormattedTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_applicationDateFormattedTextFieldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
