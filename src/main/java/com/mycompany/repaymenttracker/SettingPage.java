@@ -17,6 +17,14 @@ public class SettingPage extends javax.swing.JInternalFrame {
      */
     public SettingPage() {
         initComponents();
+        updateInfoButton.setVisible(false);
+        newEmailTextField.setVisible(false);
+        emailLabel2.setVisible(false);
+        newPasswordTextField.setVisible(false);
+        passwordLabel2.setVisible(false);
+        currentEmailTextField.setEditable(false);
+        currentPasswordTextField.setEditable(false);
+        
     }
 
     /**
@@ -30,11 +38,27 @@ public class SettingPage extends javax.swing.JInternalFrame {
 
         jPanel1 = new javax.swing.JPanel();
         deleteAccountButton = new javax.swing.JButton();
+        updateEmailPasswordButton = new javax.swing.JButton();
+        aboutButton = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        currentEmailTextField = new javax.swing.JTextField();
+        emailLabel = new javax.swing.JLabel();
+        passwordLabel = new javax.swing.JLabel();
+        updateInfoButton = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        passwordLabel2 = new javax.swing.JLabel();
+        newEmailTextField = new javax.swing.JTextField();
+        emailLabel2 = new javax.swing.JLabel();
+        newPasswordTextField = new javax.swing.JTextField();
+        currentPasswordTextField = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setPreferredSize(new java.awt.Dimension(650, 500));
 
+        jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setPreferredSize(new java.awt.Dimension(640, 490));
 
+        deleteAccountButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         deleteAccountButton.setText("DELETE ACCOUNT");
         deleteAccountButton.setBorderPainted(false);
         deleteAccountButton.setOpaque(true);
@@ -47,21 +71,130 @@ public class SettingPage extends javax.swing.JInternalFrame {
             }
         });
 
+        updateEmailPasswordButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        updateEmailPasswordButton.setText("Update Email and Password");
+        updateEmailPasswordButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateEmailPasswordButtonActionPerformed(evt);
+            }
+        });
+
+        aboutButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        aboutButton.setText("About");
+        aboutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutButtonActionPerformed(evt);
+            }
+        });
+
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
+        jPanel2.setPreferredSize(new java.awt.Dimension(280, 380));
+
+        emailLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        emailLabel.setForeground(new java.awt.Color(255, 255, 255));
+        emailLabel.setText("Email:");
+
+        passwordLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        passwordLabel.setForeground(new java.awt.Color(255, 255, 255));
+        passwordLabel.setText("Password:");
+
+        updateInfoButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        updateInfoButton.setText("UPDATE");
+        updateInfoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateInfoButtonActionPerformed(evt);
+            }
+        });
+
+        passwordLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        passwordLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        passwordLabel2.setText("New Password:");
+
+        emailLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        emailLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        emailLabel2.setText("New Email:");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(emailLabel)
+                            .addComponent(currentEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(passwordLabel)
+                            .addComponent(passwordLabel2)
+                            .addComponent(emailLabel2)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(currentPasswordTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                                .addComponent(newPasswordTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(newEmailTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING))))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(70, 70, 70)
+                        .addComponent(updateInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(43, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(44, 44, 44)
+                .addComponent(emailLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(currentEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(passwordLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(currentPasswordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(emailLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(newEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(passwordLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(newPasswordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addComponent(updateInfoButton)
+                .addGap(31, 31, 31))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(210, 210, 210)
-                .addComponent(deleteAccountButton, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(217, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(aboutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(updateEmailPasswordButton)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(deleteAccountButton, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(70, 70, 70))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(382, Short.MAX_VALUE)
+                .addGap(122, 122, 122)
+                .addComponent(updateEmailPasswordButton)
+                .addGap(29, 29, 29)
+                .addComponent(aboutButton)
+                .addGap(34, 34, 34)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(52, 52, 52)
                 .addComponent(deleteAccountButton)
-                .addGap(59, 59, 59))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(35, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(49, 49, 49))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -87,9 +220,39 @@ public class SettingPage extends javax.swing.JInternalFrame {
         deleteAccountButton.setBackground(originalColor);
     }//GEN-LAST:event_deleteAccountButtonMouseExited
 
+    private void updateInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateInfoButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_updateInfoButtonActionPerformed
+
+    private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_aboutButtonActionPerformed
+
+    private void updateEmailPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateEmailPasswordButtonActionPerformed
+        updateInfoButton.setVisible(true);
+        newEmailTextField.setVisible(true);
+        emailLabel2.setVisible(true);
+        newPasswordTextField.setVisible(true);
+        passwordLabel2.setVisible(true);
+    }//GEN-LAST:event_updateEmailPasswordButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton aboutButton;
+    private javax.swing.JTextField currentEmailTextField;
+    private javax.swing.JTextField currentPasswordTextField;
     private javax.swing.JButton deleteAccountButton;
+    private javax.swing.JLabel emailLabel;
+    private javax.swing.JLabel emailLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JTextField newEmailTextField;
+    private javax.swing.JTextField newPasswordTextField;
+    private javax.swing.JLabel passwordLabel;
+    private javax.swing.JLabel passwordLabel2;
+    private javax.swing.JButton updateEmailPasswordButton;
+    private javax.swing.JButton updateInfoButton;
     // End of variables declaration//GEN-END:variables
 }
