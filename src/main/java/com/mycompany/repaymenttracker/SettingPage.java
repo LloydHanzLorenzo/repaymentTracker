@@ -221,7 +221,11 @@ public class SettingPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_deleteAccountButtonMouseExited
 
     private void updateInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateInfoButtonActionPerformed
-        // TODO add your handling code here:
+        updateInfoButton.setVisible(false);
+        newEmailTextField.setVisible(false);
+        emailLabel2.setVisible(false);
+        newPasswordTextField.setVisible(false);
+        passwordLabel2.setVisible(false);
     }//GEN-LAST:event_updateInfoButtonActionPerformed
 
     private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
