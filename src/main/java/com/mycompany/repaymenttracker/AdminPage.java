@@ -458,7 +458,7 @@ public class AdminPage extends javax.swing.JFrame {
     private void jPanel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MouseClicked
         // TODO add your handling code here:
         jDesktopPane1.removeAll();
-        AdminProfilePage APP = new AdminProfilePage();
+        AdminProfilePage APP = new AdminProfilePage(this.loggedInAdminId); 
         jDesktopPane1.add(APP).setVisible(true);
     }//GEN-LAST:event_jPanel3MouseClicked
 
@@ -523,7 +523,7 @@ public class AdminPage extends javax.swing.JFrame {
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         jDesktopPane1.removeAll();
-        AdminProfilePage APP = new AdminProfilePage();
+        AdminProfilePage APP = new AdminProfilePage(this.loggedInAdminId);
         jDesktopPane1.add(APP).setVisible(true);
     }//GEN-LAST:event_jLabel2MouseClicked
 

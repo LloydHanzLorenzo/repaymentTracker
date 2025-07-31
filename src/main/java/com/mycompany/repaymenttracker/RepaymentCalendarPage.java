@@ -19,20 +19,16 @@ import java.sql.ResultSet;
 
 public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
 
-    /** Creates new form RepaymentCalendarPage */
     public RepaymentCalendarPage() {
         initComponents();
 
-        // Initialize and add the evaluator
         HighlightEvaluator evaluator = new HighlightEvaluator();
 
-        // Replace this list with real data from DB or logic
         List<Date> delinquentDates = getDelinquentDates();
         for (Date d : delinquentDates) {
             evaluator.add(d);
         }
 
-        // Attach to calendar
         jCalendar1.getDayChooser().addDateEvaluator(evaluator);
         jCalendar1.setCalendar(jCalendar1.getCalendar());
     }
@@ -40,12 +36,10 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
     private List<Date> getDelinquentDates() {
         List<Date> dates = new ArrayList<>();
 
-        // Database credentials (replace these placeholders later)
         String url = "jdbc:mysql://localhost:3306/your_database_name";
         String user = "your_username";
         String password = "your_password";
 
-        // Example SQL query - modify this once your schema is ready
         String sql = "SELECT due_date FROM repayments WHERE status = 'delinquent'";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -53,14 +47,14 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Date dueDate = rs.getDate("due_date"); // SQL Date
+                Date dueDate = rs.getDate("due_date");
                 if (dueDate != null) {
                     dates.add(zeroTime(dueDate));
                 }
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // Log error or show dialog in production
+            e.printStackTrace();
         }
 
         return dates;
