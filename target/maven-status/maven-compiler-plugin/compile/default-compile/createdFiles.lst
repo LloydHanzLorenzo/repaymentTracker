@@ -28,6 +28,7 @@ com\mycompany\repaymenttracker\AdminPage$6.class
 com\mycompany\repaymenttracker\AdminProfilePage$2.class
 com\mycompany\repaymenttracker\AdminPage.class
 com\mycompany\repaymenttracker\SettingPage$2.class
+com\mycompany\repaymenttracker\AlgorithmPage$3.class
 com\mycompany\repaymenttracker\ProfilePage$4.class
 com\mycompany\repaymenttracker\UpdatingInfoSplashScreen.class
 com\mycompany\repaymenttracker\Borrowers$3.class
@@ -36,6 +37,7 @@ com\mycompany\repaymenttracker\ProfilePage$12.class
 com\mycompany\repaymenttracker\SignUpPage$1.class
 com\mycompany\repaymenttracker\DelinquentAccounts.class
 com\mycompany\repaymenttracker\SettingPage$1.class
+com\mycompany\repaymenttracker\AlgorithmPage$4.class
 com\mycompany\repaymenttracker\LogInPage$1.class
 com\mycompany\repaymenttracker\BorrowMoneyPage$5.class
 com\mycompany\repaymenttracker\UserPage$10.class
@@ -63,6 +65,7 @@ com\mycompany\repaymenttracker\AdminPage$12.class
 com\mycompany\repaymenttracker\UserPage$11.class
 com\mycompany\repaymenttracker\Borrowers$5.class
 com\mycompany\repaymenttracker\ProfilePage$2.class
+com\mycompany\repaymenttracker\AlgorithmPage$5.class
 com\mycompany\repaymenttracker\Borrowers$8.class
 com\mycompany\repaymenttracker\AdminPage$7.class
 com\mycompany\repaymenttracker\AlgorithmPage$2.class
