@@ -505,7 +505,7 @@
         <Component class="javax.swing.JLabel" name="fNameEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -515,7 +515,7 @@
         <Component class="javax.swing.JLabel" name="mNameEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -525,7 +525,7 @@
         <Component class="javax.swing.JLabel" name="lNameEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -535,7 +535,7 @@
         <Component class="javax.swing.JLabel" name="nationalityEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -545,7 +545,7 @@
         <Component class="javax.swing.JLabel" name="contactNumberEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -555,9 +555,8 @@
         <Component class="javax.swing.JLabel" name="emailAddressEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="jL"/>
           </Properties>
           <Events>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="emailAddressEditButtonMouseClicked"/>
@@ -566,7 +565,7 @@
         <Component class="javax.swing.JLabel" name="homeAddressEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -584,7 +583,7 @@
         <Component class="javax.swing.JLabel" name="employmentStatusEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>
@@ -619,7 +618,7 @@
         <Component class="javax.swing.JLabel" name="validIdEditButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\lloyd\OneDrive\Documents\NetBeansProjects\repaymentTracker\src\main\java\com\mycompany\repaymenttracker\Images\editButton.png"/>
+              <Image iconType="3" name="/images/editButton.png"/>
             </Property>
           </Properties>
           <Events>

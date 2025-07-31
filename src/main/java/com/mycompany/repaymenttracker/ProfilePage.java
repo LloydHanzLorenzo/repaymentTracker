@@ -232,50 +232,49 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel9.setText("Last Name");
 
-        fNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        fNameEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         fNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 fNameEditButtonMouseClicked(evt);
             }
         });
 
-        mNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        mNameEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         mNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 mNameEditButtonMouseClicked(evt);
             }
         });
 
-        lNameEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        lNameEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         lNameEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lNameEditButtonMouseClicked(evt);
             }
         });
 
-        nationalityEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        nationalityEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         nationalityEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 nationalityEditButtonMouseClicked(evt);
             }
         });
 
-        contactNumberEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        contactNumberEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         contactNumberEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 contactNumberEditButtonMouseClicked(evt);
             }
         });
 
-        emailAddressEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
-        emailAddressEditButton.setText("jL");
+        emailAddressEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         emailAddressEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 emailAddressEditButtonMouseClicked(evt);
             }
         });
 
-        homeAddressEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        homeAddressEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         homeAddressEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 homeAddressEditButtonMouseClicked(evt);
@@ -285,7 +284,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel10.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel10.setText("Employment Status");
 
-        employmentStatusEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        employmentStatusEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         employmentStatusEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 employmentStatusEditButtonMouseClicked(evt);
@@ -297,7 +296,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         jLabel11.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel11.setText("Valid I.D. Number");
 
-        validIdEditButton.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\editButton.png")); // NOI18N
+        validIdEditButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/editButton.png"))); // NOI18N
         validIdEditButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 validIdEditButtonMouseClicked(evt);
@@ -458,7 +457,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
         );
 
         pack();

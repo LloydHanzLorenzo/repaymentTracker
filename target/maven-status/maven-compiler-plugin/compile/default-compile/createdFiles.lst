@@ -6,6 +6,7 @@ com\mycompany\repaymenttracker\UserPage$3.class
 com\mycompany\repaymenttracker\LogInPage.class
 com\mycompany\repaymenttracker\ProfilePage$17.class
 com\mycompany\repaymenttracker\RepaymentCalendarPage.class
+com\mycompany\repaymenttracker\AlgorithmPage$9.class
 com\mycompany\repaymenttracker\BorrowMoneyPage$3.class
 com\mycompany\repaymenttracker\ProfilePage$6.class
 com\mycompany\repaymenttracker\Borrowers$1.class
@@ -14,6 +15,7 @@ com\mycompany\repaymenttracker\AlgorithmPage.class
 com\mycompany\repaymenttracker\LogInPage$4.class
 com\mycompany\repaymenttracker\ProfilePage$3.class
 com\mycompany\repaymenttracker\SettingPage.class
+com\mycompany\repaymenttracker\AlgorithmPage$6.class
 com\mycompany\repaymenttracker\UserPage$9.class
 com\mycompany\repaymenttracker\RepaymentTracker.class
 com\mycompany\repaymenttracker\ProfilePage$11.class
@@ -100,10 +102,12 @@ com\mycompany\repaymenttracker\ProfilePage$16.class
 com\mycompany\repaymenttracker\UserPage$5.class
 com\mycompany\repaymenttracker\AdminProfilePage.class
 com\mycompany\repaymenttracker\ProfilePage$8.class
+com\mycompany\repaymenttracker\AlgorithmPage$7.class
 com\mycompany\repaymenttracker\Borrowers$6.class
 com\mycompany\repaymenttracker\AdminPage$4.class
 com\mycompany\repaymenttracker\UserPage$12.class
 com\mycompany\repaymenttracker\SettingPage$3.class
+com\mycompany\repaymenttracker\AlgorithmPage$10.class
 com\mycompany\repaymenttracker\AdminPage$13.class
 com\mycompany\repaymenttracker\UserPage.class
 com\mycompany\repaymenttracker\Borrowers.class
@@ -112,4 +116,5 @@ com\mycompany\repaymenttracker\AlgorithmPage$1.class
 com\mycompany\repaymenttracker\UserPage$4.class
 com\mycompany\repaymenttracker\Borrowers$11.class
 com\mycompany\repaymenttracker\MenuPage$2.class
+com\mycompany\repaymenttracker\AlgorithmPage$8.class
 com\mycompany\repaymenttracker\ProfilePage$10.class
