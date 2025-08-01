@@ -40,13 +40,16 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
 
         String sql = "SELECT l.loan_id, CONCAT(b.first_name, ' ', b.last_name) AS borrower_name, "
                 + "(l.loan_amount - IFNULL(SUM(r.amount_paid), 0)) AS amount_owed, "
-                + "MAX(r.payment_date) AS last_payment_date "
+                + "MAX(r.payment_date) AS last_payment_date, l.approval_date "
                 + "FROM loans l "
                 + "JOIN borrowers b ON l.borrower_id = b.borrower_id "
                 + "LEFT JOIN repayments r ON l.loan_id = r.loan_id "
                 + "WHERE l.loan_status = 'Approved' "
-                + "GROUP BY l.loan_id, borrower_name, l.loan_amount "
-                + "HAVING amount_owed > 0 AND (last_payment_date IS NULL OR last_payment_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY))";
+                + "GROUP BY l.loan_id, borrower_name, l.loan_amount, l.approval_date "
+                + "HAVING amount_owed > 0 AND ("
+                + "    (last_payment_date IS NOT NULL AND last_payment_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY)) OR "
+                + "    (last_payment_date IS NULL AND approval_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY))"
+                + ")";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
@@ -466,13 +469,16 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
 
         String sql = "SELECT l.loan_id, CONCAT(b.first_name, ' ', b.last_name) AS borrower_name, "
                 + "(l.loan_amount - IFNULL(SUM(r.amount_paid), 0)) AS amount_owed, "
-                + "MAX(r.payment_date) AS last_payment_date "
+                + "MAX(r.payment_date) AS last_payment_date, l.approval_date "
                 + "FROM loans l "
                 + "JOIN borrowers b ON l.borrower_id = b.borrower_id "
                 + "LEFT JOIN repayments r ON l.loan_id = r.loan_id "
                 + "WHERE l.loan_status = 'Approved' AND CAST(l.loan_id AS CHAR) LIKE ? "
-                + "GROUP BY l.loan_id, borrower_name, l.loan_amount "
-                + "HAVING amount_owed > 0 AND (last_payment_date IS NULL OR last_payment_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY))";
+                + "GROUP BY l.loan_id, borrower_name, l.loan_amount, l.approval_date "
+                + "HAVING amount_owed > 0 AND ("
+                + "    (last_payment_date IS NOT NULL AND last_payment_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY)) OR "
+                + "    (last_payment_date IS NULL AND approval_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY))"
+                + ")";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
