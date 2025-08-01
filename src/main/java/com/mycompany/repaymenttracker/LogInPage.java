@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -190,7 +191,78 @@ public class LogInPage extends javax.swing.JFrame {
     }//GEN-LAST:event_createAccountButtonMouseExited
 
     private void logInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInButtonActionPerformed
+        String email = emailTextField.getText();
+        String enteredPassword = new String(passwordTextField.getPassword());
 
+        if (email.isEmpty() || enteredPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Email and Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                JOptionPane.showMessageDialog(this, "Failed to connect to the database.", "Connection Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String sql = "SELECT user_id, password_hash, role, account_status FROM users WHERE email = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, email);
+
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+
+                if (BCrypt.checkpw(enteredPassword, storedHash)) {
+                    String status = rs.getString("account_status");
+                    if ("Deactivated".equals(status)) {
+                        JOptionPane.showMessageDialog(this, "This account has been deactivated.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    
+                    String role = rs.getString("role");
+                    int userId = rs.getInt("user_id");
+
+                    JOptionPane.showMessageDialog(this, "Login Successful!");
+
+                    if ("admin".equals(role)) {
+                        new AdminPage(userId).setVisible(true);
+                    } else {
+                        new UserPage(userId).setVisible(true);
+                    }
+                    this.dispose();
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "A database error occurred.", "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_logInButtonActionPerformed
 
     private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed

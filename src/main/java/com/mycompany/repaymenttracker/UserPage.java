@@ -10,18 +10,23 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author lloyd
  */
 public class UserPage extends javax.swing.JFrame {
+    private int loggedInUserId;
+    
     Color panedefault;
     Color paneClick;
     /**
      * Creates new form UserPage
      */
-    public UserPage() {
+    public UserPage(int userId) {
+        this.loggedInUserId = userId;
+        
         initComponents();
         
         panedefault = new Color(252, 252, 252);
@@ -377,7 +382,17 @@ public class UserPage extends javax.swing.JFrame {
     
     
     private void logOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logOutButtonActionPerformed
-        // TODO add your handling code here:
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to log out?",
+                "Logout",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            new MenuPage().setVisible(true);
+            this.dispose();
+        }
     }//GEN-LAST:event_logOutButtonActionPerformed
 
     private void jPanel3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MousePressed
@@ -399,16 +414,15 @@ public class UserPage extends javax.swing.JFrame {
     }//GEN-LAST:event_profilePanelButtonMousePressed
 
     private void profilePanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_profilePanelButtonMouseClicked
-
-        ProfilePage profile = new ProfilePage();
-        jDesktopPane1.add(profile);
+        ProfilePage profile = new ProfilePage(this.loggedInUserId);
+        jDesktopPane1.add(profile).setVisible(true);
         profile.setVisible(true); 
     }//GEN-LAST:event_profilePanelButtonMouseClicked
 
     private void payPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMouseClicked
         jDesktopPane1.removeAll();
-        PayPage PP = new PayPage();
-        jDesktopPane1.add(PP).setVisible(true);
+        PayPage payLoanPanel = new PayPage(this.loggedInUserId);
+        jDesktopPane1.add(payLoanPanel).setVisible(true);
     }//GEN-LAST:event_payPanelButtonMouseClicked
 
     private void payPanelButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_payPanelButtonMousePressed
@@ -434,38 +448,38 @@ public class UserPage extends javax.swing.JFrame {
 
     private void settingPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_settingPanelButtonMouseClicked
         jDesktopPane1.removeAll();
-        SettingPage ST = new SettingPage();
-        jDesktopPane1.add(ST).setVisible(true);
+        SettingPage settingsPanel = new SettingPage(this.loggedInUserId);
+        jDesktopPane1.add(settingsPanel).setVisible(true);
     }//GEN-LAST:event_settingPanelButtonMouseClicked
 
     private void borrowPanelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_borrowPanelButtonMouseClicked
         jDesktopPane1.removeAll();
-        BorrowMoneyPage BMP = new BorrowMoneyPage();
-        jDesktopPane1.add(BMP).setVisible(true);
+        BorrowMoneyPage borrowPanel = new BorrowMoneyPage(this.loggedInUserId);
+        jDesktopPane1.add(borrowPanel).setVisible(true);
     }//GEN-LAST:event_borrowPanelButtonMouseClicked
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         jDesktopPane1.removeAll();
-        ProfilePage profile = new ProfilePage();
+        ProfilePage profile = new ProfilePage(this.loggedInUserId);
         jDesktopPane1.add(profile).setVisible(true);
     }//GEN-LAST:event_jLabel2MouseClicked
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
         jDesktopPane1.removeAll();
-        PayPage PP = new PayPage();
-        jDesktopPane1.add(PP).setVisible(true);
+        PayPage payLoanPanel = new PayPage(this.loggedInUserId);
+        jDesktopPane1.add(payLoanPanel).setVisible(true);
     }//GEN-LAST:event_jLabel4MouseClicked
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
         jDesktopPane1.removeAll();
-        BorrowMoneyPage BMP = new BorrowMoneyPage();
-        jDesktopPane1.add(BMP).setVisible(true);
+        BorrowMoneyPage borrowPanel = new BorrowMoneyPage(this.loggedInUserId);
+        jDesktopPane1.add(borrowPanel).setVisible(true);
     }//GEN-LAST:event_jLabel5MouseClicked
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
         jDesktopPane1.removeAll();
-        SettingPage ST = new SettingPage();
-        jDesktopPane1.add(ST).setVisible(true);
+        SettingPage settingsPanel = new SettingPage(this.loggedInUserId);
+        jDesktopPane1.add(settingsPanel).setVisible(true);
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MousePressed
@@ -500,6 +514,8 @@ public class UserPage extends javax.swing.JFrame {
         pane4.setBackground(paneClick);
     }//GEN-LAST:event_jLabel1MousePressed
 
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -530,7 +546,7 @@ public class UserPage extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new UserPage().setVisible(true);
+                new UserPage(2).setVisible(true);
             }
         });
 

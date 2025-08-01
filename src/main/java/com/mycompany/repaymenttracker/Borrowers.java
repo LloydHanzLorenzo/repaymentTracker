@@ -20,55 +20,116 @@ import javax.swing.JOptionPane;
  * @author admin
  */
 public class Borrowers extends javax.swing.JInternalFrame {
-    private int selectedBorrowerId = -1;
+    private int loggedInAdminId;
+    private int selectedLoanId = -1;
 
     /**
      * Creates new form Borrowers
      */
-    public Borrowers() {
+    public Borrowers(int adminId) {
+        this.loggedInAdminId = adminId;
         initComponents();
-        
-        tblBorrowers.setModel(new DefaultTableModel (
-                new Object[][]{},
-                new String[]{"ID", "Full Name", "Birthdate", "Valid ID No.", "Email", "Phone", "Address", "Employment Status", "Monthly Income", "Existing Debt", "Loan Amount", "Loan Purpose", "Loan Status", "Application Date", "Approval Date", "Repayment Term", "Interest Rate", "Notes"}
-        ));
-        
-        tblBorrowers.getSelectionModel().addListSelectionListener(event -> {
-            int row = tblBorrowers.getSelectedRow();
-            if (row >= 0) {
-                selectedBorrowerId = (int) tblBorrowers.getValueAt(row, 0); // Get ID
-                txtName.setText(tblBorrowers.getValueAt(row, 1).toString());
-                
-                Date birthdate = (Date) tblBorrowers.getValueAt(row, 2);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                txtBirthdate.setText(dateFormat.format(birthdate));
-                
-                txtIDNumber.setText(tblBorrowers.getValueAt(row, 3).toString());
-                txtEmail.setText(tblBorrowers.getValueAt(row, 4).toString());
-                txtPhone.setText(tblBorrowers.getValueAt(row, 5).toString());
-                txtAddress.setText(tblBorrowers.getValueAt(row, 6).toString());
-                txtEmployment.setSelectedItem(tblBorrowers.getValueAt(row, 7).toString());
-                txtIncome.setText(tblBorrowers.getValueAt(row, 8).toString());
-                txtDebt.setText(tblBorrowers.getValueAt(row, 9).toString());
-                txtLoanAmt.setText(tblBorrowers.getValueAt(row, 10).toString());
-                txtPurpose.setText(tblBorrowers.getValueAt(row, 11).toString());
-                txtStatus.setSelectedItem(tblBorrowers.getValueAt(row, 12).toString());
-                
-                Timestamp applicationDate = (Timestamp) tblBorrowers.getValueAt(row, 13);
-                txtApplication.setText(dateFormat.format(new Date(applicationDate.getTime())));
-                
-                Timestamp approvalDate = (Timestamp) tblBorrowers.getValueAt(row, 14);
-                if (approvalDate != null) {
-                    txtApproval.setText(dateFormat.format(new Date(approvalDate.getTime())));
-                } else {
-                    txtApproval.setText("");
-                }
-                
-                txtTerm.setText(tblBorrowers.getValueAt(row, 15).toString());
-                txtInterest.setText(tblBorrowers.getValueAt(row, 16).toString());
-                txtNotes.setText(tblBorrowers.getValueAt(row, 17).toString());
+        loadLoanAndBorrowerData();
+        setFormFieldsEditable(false);
+    }
+    
+    private void loadLoanAndBorrowerData() {
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Loan ID", "Full Name", "Loan Amount", "Status", "Application Date"}, 0);
+
+        String sql = "SELECT l.loan_id, CONCAT(b.first_name, ' ', b.last_name) AS full_name, "
+                + "l.loan_amount, l.loan_status, l.application_date "
+                + "FROM loans l JOIN borrowers b ON l.borrower_id = b.borrower_id ORDER BY l.application_date DESC";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("loan_id"),
+                    rs.getString("full_name"),
+                    rs.getBigDecimal("loan_amount"),
+                    rs.getString("loan_status"),
+                    rs.getTimestamp("application_date")
+                });
             }
-        });
+            tblBorrowers.setModel(model);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load borrower records.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void clearFormFields() {
+        this.selectedLoanId = -1;
+        tblBorrowers.clearSelection();
+
+        txtName.setText("");
+        txtBirthdate.setText("");
+        txtIDNumber.setText("");
+        txtEmail.setText("");
+        txtPhone.setText("");
+        txtAddress.setText("");
+        txtIncome.setText("");
+        txtDebt.setText("");
+        txtLoanAmt.setText("");
+        txtPurpose.setText("");
+        applicationDateFormattedTF.setText("");
+        jFormattedTextField1.setText("");
+        txtTerm.setText("");
+        txtInterest.setText("");
+        txtNotes.setText("");
+
+        txtEmployment.setSelectedIndex(0);
+        txtStatus.setSelectedIndex(0);
+        
+        setFormFieldsEditable(false);
+    }
+    
+    private void setFormFieldsEditable(boolean isEditable) {
+        txtName.setEditable(false);
+        txtBirthdate.setEditable(false);
+        txtIDNumber.setEditable(false);
+        txtEmail.setEditable(false);
+        txtPhone.setEditable(false);
+        txtAddress.setEditable(false);
+        txtEmployment.setEnabled(false);
+        txtIncome.setEditable(false);
+        txtDebt.setEditable(false);
+        txtLoanAmt.setEditable(false);
+        txtPurpose.setEditable(false);
+        applicationDateFormattedTF.setEditable(false);
+        jFormattedTextField1.setEditable(false);
+        txtTerm.setEditable(false);
+        txtInterest.setEditable(false);
+
+        txtStatus.setEnabled(isEditable);
+        txtNotes.setEditable(isEditable);
+
+        btnUpdate.setEnabled(isEditable);
+        btnDeactivate.setEnabled(isEditable);
+    }
+    
+    private void calculateAndDisplayCurrentBalance(int loanId, double totalLoanAmount) {
+        String sql = "SELECT SUM(amount_paid) AS total_repaid FROM repayments WHERE loan_id = ?";
+        double totalRepaid = 0.0;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, loanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    totalRepaid = rs.getDouble("total_repaid");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            txtDebt.setText("Error");
+            return;
+        }
+
+        double currentBalance = totalLoanAmount - totalRepaid;
+
+        txtDebt.setText(String.format("%.2f", currentBalance));
     }
 
     /**
@@ -109,9 +170,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
         jLabel12 = new javax.swing.JLabel();
         txtStatus = new javax.swing.JComboBox<>();
         jLabel14 = new javax.swing.JLabel();
-        txtApplication = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
-        txtApproval = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
         txtTerm = new javax.swing.JTextField();
         jLabel17 = new javax.swing.JLabel();
@@ -119,9 +178,8 @@ public class Borrowers extends javax.swing.JInternalFrame {
         jLabel18 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtNotes = new javax.swing.JTextArea();
-        btnSave = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
-        btnDelete = new javax.swing.JButton();
+        btnDeactivate = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblBorrowers = new javax.swing.JTable();
         btnLoad = new javax.swing.JButton();
@@ -129,6 +187,9 @@ public class Borrowers extends javax.swing.JInternalFrame {
         txtSearch = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        applicationDateFormattedTF = new javax.swing.JFormattedTextField();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
 
         setPreferredSize(new java.awt.Dimension(1260, 610));
 
@@ -136,7 +197,6 @@ public class Borrowers extends javax.swing.JInternalFrame {
         jPanel1.setPreferredSize(new java.awt.Dimension(1260, 610));
 
         jLabel1.setFont(new java.awt.Font("Trebuchet MS", 1, 36)); // NOI18N
-        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\lloyd\\OneDrive\\Documents\\NetBeansProjects\\repaymentTracker\\src\\main\\java\\com\\mycompany\\repaymenttracker\\Images\\user.png")); // NOI18N
         jLabel1.setText("Borrower Records");
 
         jPanel2.setBackground(new java.awt.Color(0, 204, 204));
@@ -148,6 +208,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
         jLabel3.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel3.setText("Birthdate");
 
+        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         txtBirthdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBirthdateActionPerformed(evt);
@@ -185,7 +246,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
         });
 
         jLabel13.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
-        jLabel13.setText("Existing Debt");
+        jLabel13.setText("Current Balance");
 
         txtDebt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -219,20 +280,8 @@ public class Borrowers extends javax.swing.JInternalFrame {
         jLabel14.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel14.setText("Application Date");
 
-        txtApplication.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtApplicationActionPerformed(evt);
-            }
-        });
-
         jLabel15.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel15.setText("Approval Date");
-
-        txtApproval.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtApprovalActionPerformed(evt);
-            }
-        });
 
         jLabel16.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel16.setText("Repayment Term");
@@ -259,13 +308,6 @@ public class Borrowers extends javax.swing.JInternalFrame {
         txtNotes.setRows(5);
         jScrollPane3.setViewportView(txtNotes);
 
-        btnSave.setText("Save");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
-            }
-        });
-
         btnUpdate.setText("Update");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -273,10 +315,10 @@ public class Borrowers extends javax.swing.JInternalFrame {
             }
         });
 
-        btnDelete.setText("Delete");
-        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+        btnDeactivate.setText("Deactivate");
+        btnDeactivate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeleteActionPerformed(evt);
+                btnDeactivateActionPerformed(evt);
             }
         });
 
@@ -291,6 +333,11 @@ public class Borrowers extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblBorrowers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblBorrowersMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblBorrowers);
 
         btnLoad.setText("Load Data");
@@ -309,16 +356,32 @@ public class Borrowers extends javax.swing.JInternalFrame {
             }
         });
 
+        jLabel21.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/userProfile2.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 200, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel21)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 200, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel21)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
+
+        applicationDateFormattedTF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
+
+        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -351,11 +414,9 @@ public class Borrowers extends javax.swing.JInternalFrame {
                                     .addComponent(txtIDNumber)
                                     .addComponent(txtEmail)))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(btnSave)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnUpdate)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnDelete)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnDeactivate)))
                         .addGap(38, 38, 38)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel12)
@@ -366,33 +427,41 @@ public class Borrowers extends javax.swing.JInternalFrame {
                             .addComponent(txtPhone)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                             .addComponent(txtStatus, 0, 190, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(txtEmployment, 0, 190, Short.MAX_VALUE)
-                                .addComponent(jLabel9)
-                                .addComponent(txtIncome)
-                                .addComponent(jLabel13)
-                                .addComponent(txtDebt)
-                                .addComponent(jLabel10)
-                                .addComponent(txtLoanAmt)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(txtEmployment, 0, 190, Short.MAX_VALUE)
+                                                .addComponent(jLabel9)
+                                                .addComponent(txtIncome)
+                                                .addComponent(jLabel13)
+                                                .addComponent(txtDebt)
+                                                .addComponent(jLabel10)
+                                                .addComponent(txtLoanAmt))
+                                            .addComponent(jLabel8)))
+                                    .addComponent(applicationDateFormattedTF))
+                                .addGap(39, 39, 39))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel14)
-                                .addComponent(txtApplication))
-                            .addComponent(jLabel8))
-                        .addGap(39, 39, 39)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel15)
                             .addComponent(jLabel18)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtInterest, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel17)
-                            .addComponent(txtTerm, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel16)
-                            .addComponent(txtApproval, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtTerm, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)))
                         .addGap(68, 68, 68))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(40, Short.MAX_VALUE))))
+                        .addContainerGap(42, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -410,7 +479,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtEmployment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(txtIncome, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -426,30 +495,34 @@ public class Borrowers extends javax.swing.JInternalFrame {
                                     .addComponent(jLabel10)
                                     .addComponent(jLabel18))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addComponent(txtLoanAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel14)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtApplication, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtLoanAmt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(16, 16, 16))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(32, 32, 32)
-                                .addComponent(txtPurpose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel12)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(16, 16, 16))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGap(22, 22, 22)
+                                        .addComponent(txtPurpose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(jLabel12)
+                                            .addComponent(jLabel14))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(applicationDateFormattedTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel11))
+                                .addGap(14, 14, 14))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel15)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtApproval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(4, 4, 4)
+                                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel16)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtTerm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -472,25 +545,22 @@ public class Borrowers extends javax.swing.JInternalFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtIDNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel5)
-                                            .addComponent(jLabel11))
+                                        .addComponent(jLabel5)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnSave)
                                     .addComponent(btnUpdate)
-                                    .addComponent(btnDelete))))
+                                    .addComponent(btnDeactivate))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel19)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnSearch))
+                        .addComponent(btnSearch)
+                        .addComponent(jLabel19))
                     .addComponent(btnLoad))
                 .addGap(35, 35, 35))
         );
@@ -504,7 +574,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
                 .addComponent(jLabel1)
                 .addContainerGap(906, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(11, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31))
         );
@@ -526,7 +596,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
         );
 
         pack();
@@ -559,14 +629,6 @@ public class Borrowers extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDebtActionPerformed
 
-    private void txtApplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApplicationActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtApplicationActionPerformed
-
-    private void txtApprovalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApprovalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtApprovalActionPerformed
-
     private void txtTermActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTermActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtTermActionPerformed
@@ -574,388 +636,251 @@ public class Borrowers extends javax.swing.JInternalFrame {
     private void txtInterestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtInterestActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtInterestActionPerformed
-
-    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        // TODO add your handling code here:
-        String fullName = txtName.getText();
-        String birthDate = txtBirthdate.getText();
-        String idNumber = txtIDNumber.getText();
-        String emailAddress = txtEmail.getText();
-        String phoneNumber = txtPhone.getText();
-        String address = txtAddress.getText();
-        String employmentStatus = (String) txtEmployment.getSelectedItem();
-        BigDecimal monthlyIncome = new BigDecimal(txtIncome.getText());
-        BigDecimal existingDebt = new BigDecimal(txtDebt.getText());
-        BigDecimal loanAmount = new BigDecimal(txtLoanAmt.getText());
-        String loanPurpose = txtPurpose.getText();
-        String loanStatus = (String) txtStatus.getSelectedItem();
-        String applicationDate = txtApplication.getText();
-        String approvalDate = txtApproval.getText();
-        int repaymentTerm = Integer.parseInt(txtTerm.getText());
-        BigDecimal interestRate = new BigDecimal(txtInterest.getText());
-        String notes = txtNotes.getText();
-
-        Date birthDateParsed = null;
-        Date applicationDateParsed = null;
-        Date approvalDateParsed = null;
-
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            birthDateParsed = dateFormat.parse(birthDate);
-            applicationDateParsed = dateFormat.parse(applicationDate);
-            if (!approvalDate.isEmpty()) {
-                approvalDateParsed = dateFormat.parse(approvalDate);
-            }
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(this,
-                "Invalid date format. Use DD/MM/YYYY (e.g., 31/12/2023).",
-                "Date Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            Connection conn = DriverManager.getConnection (
-                "jdbc:mysql://localhost:3306/borrowerdb", "root", "");
-
-            String sql = "INSERT INTO borrowers (full_name, birthdate, id_number, email, phone, address, employment_status, monthly_income, existing_debt, loan_amount, loan_purpose, loan_status, application_date, approval_date, repayment_term, interest_rate, notes)"
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            pstmt.setString(1, fullName);
-            pstmt.setDate(2, new java.sql.Date(birthDateParsed.getTime()));
-            pstmt.setString(3, idNumber);
-            pstmt.setString(4, emailAddress);
-            pstmt.setString(5, phoneNumber);
-            pstmt.setString(6, address);
-            pstmt.setString(7, employmentStatus);
-            pstmt.setBigDecimal(8, monthlyIncome);
-            pstmt.setBigDecimal(9, existingDebt);
-            pstmt.setBigDecimal(10, loanAmount);
-            pstmt.setString(11, loanPurpose);
-            pstmt.setString(12, loanStatus);
-            pstmt.setTimestamp(13, new Timestamp(applicationDateParsed.getTime()));
-            pstmt.setTimestamp(14, approvalDateParsed != null ?
-                new Timestamp(approvalDateParsed.getTime()) : null);
-            pstmt.setInt(15, repaymentTerm);
-            pstmt.setBigDecimal(16, interestRate);
-            pstmt.setString(17, notes);
-
-            int rows = pstmt.executeUpdate();
-            if(rows > 0) {
-                JOptionPane.showMessageDialog(this, "Borrower inserted successfully!");
-                txtName.setText("");
-                txtBirthdate.setText("");
-                txtIDNumber.setText("");
-                txtEmail.setText("");
-                txtPhone.setText("");
-                txtAddress.setText("");
-                txtEmployment.setSelectedIndex(0);
-                txtIncome.setText("");
-                txtDebt.setText("");
-                txtLoanAmt.setText("");
-                txtPurpose.setText("");
-                txtStatus.setSelectedIndex(0);
-                txtApplication.setText("");
-                txtApproval.setText("");
-                txtTerm.setText("");
-                txtInterest.setText("");
-                txtNotes.setText("");
-                btnLoad.doClick(); // Reload table
-            }
-
-            conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        }
-    }//GEN-LAST:event_btnSaveActionPerformed
-
-    private void clearInfo() {
-        txtName.setText("");
-        txtBirthdate.setText("");
-        txtIDNumber.setText("");
-        txtEmail.setText("");
-        txtPhone.setText("");
-        txtAddress.setText("");
-        txtEmployment.setSelectedIndex(0);
-        txtIncome.setText("");
-        txtDebt.setText("");
-        txtLoanAmt.setText("");
-        txtPurpose.setText("");
-        txtStatus.setSelectedIndex(0);
-        txtApplication.setText("");
-        txtApproval.setText("");
-        txtTerm.setText("");
-        txtInterest.setText("");
-        txtNotes.setText("");
-        selectedBorrowerId = -1;
-    }
     
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
-        String fullName = txtName.getText();
-        String birthDate = txtBirthdate.getText();
-        String idNumber = txtIDNumber.getText();
-        String emailAddress = txtEmail.getText();
-        String phoneNumber = txtPhone.getText();
-        String address = txtAddress.getText();
-        String employmentStatus = (String) txtEmployment.getSelectedItem();
-        BigDecimal monthlyIncome = new BigDecimal(txtIncome.getText());
-        BigDecimal existingDebt = new BigDecimal(txtDebt.getText());
-        BigDecimal loanAmount = new BigDecimal(txtLoanAmt.getText());
-        String loanStatus = (String) txtStatus.getSelectedItem();
-        String loanPurpose = txtPurpose.getText();
-        String applicationDate = txtApplication.getText();
-        String approvalDate = txtApproval.getText();
-        int repaymentTerm = Integer.parseInt(txtTerm.getText());
-        BigDecimal interestRate = new BigDecimal(txtInterest.getText());
-        String notes = txtNotes.getText();
-
-        if (fullName.isEmpty() || birthDate.isEmpty() || idNumber.isEmpty() || emailAddress.isEmpty() || phoneNumber.isEmpty() || address.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all required fields.");
+        if (this.selectedLoanId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a loan record from the table to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        if (selectedBorrowerId == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a borrower to update.");
-            return;
+        String newLoanStatus = txtStatus.getSelectedItem().toString();
+        String notes = txtNotes.getText().trim();
+
+        String approvalDate = null;
+        if ("Approved".equals(newLoanStatus)) {
+            approvalDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         }
 
-        Date birthDateParsed = null;
-        Date applicationDateParsed = null;
-        Date approvalDateParsed = null;
-
+        Connection conn = null;
+        PreparedStatement pstmt = null;
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            birthDateParsed = dateFormat.parse(birthDate);
-            applicationDateParsed = dateFormat.parse(applicationDate);
-            if (!approvalDate.isEmpty()) {
-                approvalDateParsed = dateFormat.parse(approvalDate);
-            }
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(this,
-                "Invalid date format. Use DD/MM/YYYY (e.g., 31/12/2023).",
-                "Date Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            conn = DBConnection.getConnection();
 
-        try {
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/borrowerdb", "root", "");
-
-            String sql = "UPDATE borrowers SET full_name=?, birthdate=?, id_number=?, email=?, phone=?, " +
-            "address=?, employment_status=?, monthly_income=?, existing_debt=?, " +
-            "loan_amount=?, loan_purpose=?, loan_status=?, application_date=?, " +
-            "approval_date=?, repayment_term=?, interest_rate=?, notes=? WHERE id=?";
-
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-
-            pstmt.setString(1, fullName);
-            pstmt.setDate(2, new java.sql.Date(birthDateParsed.getTime()));
-            pstmt.setString(3, idNumber);
-            pstmt.setString(4, emailAddress);
-            pstmt.setString(5, phoneNumber);
-            pstmt.setString(6, address);
-            pstmt.setString(7, employmentStatus);
-            pstmt.setBigDecimal(8, monthlyIncome);
-            pstmt.setBigDecimal(9, existingDebt);
-            pstmt.setBigDecimal(10, loanAmount);
-            pstmt.setString(11, loanPurpose);
-            pstmt.setString(12, loanStatus);
-            pstmt.setTimestamp(13, new Timestamp(applicationDateParsed.getTime()));
-            pstmt.setTimestamp(14, approvalDateParsed != null ?
-                new Timestamp(approvalDateParsed.getTime()) : null);
-            pstmt.setInt(15, repaymentTerm);
-            pstmt.setBigDecimal(16, interestRate);
-            pstmt.setString(17, notes);
-            pstmt.setInt(18, selectedBorrowerId);
-
-            int rows = pstmt.executeUpdate();
-
-            if (rows > 0) {
-                JOptionPane.showMessageDialog(this, "Borrower updated successfully!");
-                btnLoad.doClick(); // Reload table
-                selectedBorrowerId = -1;
-                clearInfo();
+            String sql;
+            if (approvalDate != null) {
+                sql = "UPDATE loans SET loan_status = ?, notes = ?, approval_date = ? WHERE loan_id = ?";
+            } else {
+                sql = "UPDATE loans SET loan_status = ?, notes = ? WHERE loan_id = ?";
             }
 
-            conn.close();
-        } catch (Exception e) {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, newLoanStatus);
+            pstmt.setString(2, notes);
+
+            if (approvalDate != null) {
+                pstmt.setString(3, approvalDate);
+                pstmt.setInt(4, this.selectedLoanId);
+            } else {
+                pstmt.setInt(3, this.selectedLoanId);
+            }
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Loan record #" + this.selectedLoanId + " has been updated.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadLoanAndBorrowerData();
+                clearFormFields();
+            }
+
+        } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "A database error occurred while updating the record.", "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        // TODO add your handling code here:
-        if(selectedBorrowerId == -1){
-            JOptionPane.showMessageDialog(this, "Please select a customer to delete!");
+    private void btnDeactivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeactivateActionPerformed
+        if (this.selectedLoanId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a loan record to identify the user.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Are you sure you want to delete this customer?",
-            "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                "Are you sure you want to deactivate this user's account?\nThey will no longer be able to log in.",
+                "Confirm Deactivation",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
 
-        if(confirm != JOptionPane.YES_OPTION) return;
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        String findUserSql = "SELECT b.user_id FROM loans l JOIN borrowers b ON l.borrower_id = b.borrower_id WHERE l.loan_id = ?";
+        String updateUserSql = "UPDATE users SET account_status = 'Deactivated' WHERE user_id = ?";
+
+        Connection conn = null;
+        PreparedStatement pstmtFind = null;
+        PreparedStatement pstmtUpdate = null;
+        ResultSet rs = null;
 
         try {
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/borrowerdb", "root", "");
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
 
-            String sql = "DELETE FROM borrowers WHERE id = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, selectedBorrowerId);
+            pstmtFind = conn.prepareStatement(findUserSql);
+            pstmtFind.setInt(1, this.selectedLoanId);
+            rs = pstmtFind.executeQuery();
 
-            int rows = pstmt.executeUpdate();
-            if(rows > 0){
-                JOptionPane.showMessageDialog(this, "Borrower deleted successfully!");
-                btnLoad.doClick(); // Refresh table
-                clearInfo();
+            if (rs.next()) {
+                int userIdToDeactivate = rs.getInt("user_id");
+
+                pstmtUpdate = conn.prepareStatement(updateUserSql);
+                pstmtUpdate.setInt(1, userIdToDeactivate);
+
+                int rowsAffected = pstmtUpdate.executeUpdate();
+                if (rowsAffected > 0) {
+                    conn.commit();
+                    JOptionPane.showMessageDialog(this, "User account has been deactivated.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadLoanAndBorrowerData();
+                    clearFormFields();
+                } else {
+                    conn.rollback();
+                }
             }
-
-            conn.close();
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        } finally {
+            if (conn != null) try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmtFind != null) {
+                    pstmtFind.close();
+                }
+                if (pstmtUpdate != null) {
+                    pstmtUpdate.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-    }//GEN-LAST:event_btnDeleteActionPerformed
+    }//GEN-LAST:event_btnDeactivateActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        // TODO add your handling code here:
         String keyword = txtSearch.getText().trim();
+        if (keyword.isEmpty()) {
+            loadLoanAndBorrowerData();
+            return;
+        }
 
-        try {
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/borrowerdb", "root", "");
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Loan ID", "Full Name", "Loan Amount", "Status", "Application Date"}, 0);
 
-            String sql = "SELECT * FROM borrowers WHERE "
-            + "full_name LIKE ? OR "
-            + "id_number LIKE ? OR "
-            + "email LIKE ? OR "
-            + "phone LIKE ? OR "
-            + "address LIKE ? OR "
-            + "employment_status LIKE ? OR "
-            + "loan_purpose LIKE ? OR "
-            + "loan_status LIKE ? OR "
-            + "notes LIKE ?";
+        String sql = "SELECT l.loan_id, CONCAT(b.first_name, ' ', b.last_name) AS full_name, "
+                + "l.loan_amount, l.loan_status, l.application_date "
+                + "FROM loans l JOIN borrowers b ON l.borrower_id = b.borrower_id "
+                + "WHERE b.first_name LIKE ? OR b.last_name LIKE ? OR CONCAT(b.first_name, ' ', b.last_name) LIKE ? "
+                + "ORDER BY l.application_date DESC";
 
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            String likeKeyword = "%" + keyword + "%";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, likeKeyword);
-            pstmt.setString(2, likeKeyword);
-            pstmt.setString(3, likeKeyword);
-            pstmt.setString(4, likeKeyword);
-            pstmt.setString(5, likeKeyword);
-            pstmt.setString(6, likeKeyword);
-            pstmt.setString(7, likeKeyword);
-            pstmt.setString(8, likeKeyword);
-            pstmt.setString(9, likeKeyword);
+            String searchPattern = "%" + keyword + "%";
+            pstmt.setString(1, searchPattern);
+            pstmt.setString(2, searchPattern);
+            pstmt.setString(3, searchPattern);
 
-            ResultSet rs = pstmt.executeQuery();
-
-            DefaultTableModel model = new DefaultTableModel();
-            model.addColumn("ID");
-            model.addColumn("Full Name");
-            model.addColumn("Birthdate");
-            model.addColumn("ID Number");
-            model.addColumn("Email");
-            model.addColumn("Phone");
-            model.addColumn("Address");
-            model.addColumn("Employment Status");
-            model.addColumn("Monthly Income");
-            model.addColumn("Existing Debt");
-            model.addColumn("Loan Amount");
-            model.addColumn("Loan Purpose");
-            model.addColumn("Loan Status");
-            model.addColumn("Application Date");
-            model.addColumn("Approval Date");
-            model.addColumn("Repayment Term");
-            model.addColumn("Interest Rate");
-            model.addColumn("Notes");
-
-            while(rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getInt("id"),
-                    rs.getString("full_name"),
-                    rs.getDate("birthdate"),
-                    rs.getString("id_number"),
-                    rs.getString("email"),
-                    rs.getString("phone"),
-                    rs.getString("address"),
-                    rs.getString("employment_status"),
-                    rs.getBigDecimal("monthly_income"),
-                    rs.getBigDecimal("existing_debt"),
-                    rs.getBigDecimal("loan_amount"),
-                    rs.getString("loan_purpose"),
-                    rs.getString("loan_status"),
-                    rs.getTimestamp("application_date"),
-                    rs.getTimestamp("approval_date"),
-                    rs.getInt("repayment_term"),
-                    rs.getBigDecimal("interest_rate"),
-                    rs.getString("notes")
-                });
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.isBeforeFirst()) {
+                    JOptionPane.showMessageDialog(this, "No records found matching your search.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                    tblBorrowers.setModel(model);
+                } else {
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                            rs.getInt("loan_id"),
+                            rs.getString("full_name"),
+                            rs.getBigDecimal("loan_amount"),
+                            rs.getString("loan_status"),
+                            rs.getTimestamp("application_date")
+                        });
+                    }
+                    tblBorrowers.setModel(model);
+                }
             }
-
-            tblBorrowers.setModel(model);
-            conn.close();
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Search failed: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Search failed due to a database error.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadActionPerformed
-        // TODO add your handling code here:
-        try {
-            // Connect to MySQL
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/borrowerdb", "root",
-                "");
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM borrowers");
-            DefaultTableModel model = (DefaultTableModel)
-            tblBorrowers.getModel();
-            model.setRowCount(0); // Clear existing rows
+        loadLoanAndBorrowerData();
+    }//GEN-LAST:event_btnLoadActionPerformed
 
-            while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getInt("id"),
-                    rs.getString("full_name"),
-                    rs.getDate("birthdate"),
-                    rs.getString("id_number"),
-                    rs.getString("email"),
-                    rs.getString("phone"),
-                    rs.getString("address"),
-                    rs.getString("employment_status"),
-                    rs.getBigDecimal("monthly_income"),
-                    rs.getBigDecimal("existing_debt"),
-                    rs.getBigDecimal("loan_amount"),
-                    rs.getString("loan_purpose"),
-                    rs.getString("loan_status"),
-                    rs.getTimestamp("application_date"),
-                    rs.getTimestamp("approval_date"),
-                    rs.getInt("repayment_term"),
-                    rs.getBigDecimal("interest_rate"),
-                    rs.getString("notes")
-                });
+    private void tblBorrowersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBorrowersMouseClicked
+        int selectedRow = tblBorrowers.getSelectedRow();
+        if (selectedRow == -1) {
+            return;
+        }
+
+        this.selectedLoanId = (int) tblBorrowers.getValueAt(selectedRow, 0);
+
+        String sql = "SELECT b.*, u.email, l.* FROM loans l "
+                + "JOIN borrowers b ON l.borrower_id = b.borrower_id "
+                + "JOIN users u ON b.user_id = u.user_id "
+                + "WHERE l.loan_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.selectedLoanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    txtName.setText(rs.getString("first_name") + " " + rs.getString("last_name"));
+                    txtBirthdate.setText(rs.getString("birthdate"));
+                    txtIDNumber.setText(rs.getString("valid_id_number"));
+                    txtEmail.setText(rs.getString("email"));
+                    txtPhone.setText(rs.getString("contact_number"));
+                    txtAddress.setText(rs.getString("home_address"));
+                    txtEmployment.setSelectedItem(rs.getString("employment_status"));
+                    txtIncome.setText(rs.getString("monthly_income"));
+                    double loanAmount = rs.getDouble("loan_amount");
+                    calculateAndDisplayCurrentBalance(this.selectedLoanId, loanAmount);
+
+                    txtLoanAmt.setText(rs.getString("loan_amount"));
+                    txtPurpose.setText(rs.getString("loan_purpose"));
+                    txtStatus.setSelectedItem(rs.getString("loan_status"));
+                    applicationDateFormattedTF.setText(rs.getString("application_date"));
+                    jFormattedTextField1.setText(rs.getString("approval_date"));
+                    txtTerm.setText(rs.getString("repayment_term_months"));
+                    txtInterest.setText(rs.getString("interest_rate_at_approval"));
+                    txtNotes.setText(rs.getString("notes"));
+                    
+                    setFormFieldsEditable(true);
+                }
             }
-
-            conn.close();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-    }//GEN-LAST:event_btnLoadActionPerformed
+    }//GEN-LAST:event_tblBorrowersMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDelete;
+    private javax.swing.JFormattedTextField applicationDateFormattedTF;
+    private javax.swing.JButton btnDeactivate;
     private javax.swing.JButton btnLoad;
-    private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -968,6 +893,7 @@ public class Borrowers extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -983,8 +909,6 @@ public class Borrowers extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable tblBorrowers;
     private javax.swing.JTextArea txtAddress;
-    private javax.swing.JTextField txtApplication;
-    private javax.swing.JTextField txtApproval;
     private javax.swing.JFormattedTextField txtBirthdate;
     private javax.swing.JTextField txtDebt;
     private javax.swing.JTextField txtEmail;

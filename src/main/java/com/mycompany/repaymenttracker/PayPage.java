@@ -6,20 +6,138 @@ package com.mycompany.repaymenttracker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author lloyd
  */
 public class PayPage extends javax.swing.JInternalFrame {
+    private int loggedInUserId;
+    private int selectedLoanId = -1;
 
     /**
-     * Creates new form PayPage
+     * Creates new form PayPage for a specific user.
+     *
      */
-    public PayPage() {
+    public PayPage(int userId) {
+        this.loggedInUserId = userId;
         initComponents();
+
         historyDateFormattedTextField.setEditable(false);
+        existingDebtTextField.setEditable(false);
         payDateFormattedTextField.setEditable(false);
+        totalBalanceTextField.setEditable(false);
+
+        loadUserLoans();
+    }
+    
+    private void loadUserLoans() {
+        int borrowerId = fetchBorrowerId();
+
+        if (borrowerId == -1) {
+            JOptionPane.showMessageDialog(this, "Could not find a borrower profile for this user.", "Profile Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String[] columnNames = {"Loan ID", "Amount", "Purpose", "Date Applied"};
+        javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(columnNames, 0);
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "SELECT loan_id, loan_amount, loan_purpose, application_date FROM loans WHERE borrower_id = ? AND loan_status = 'Approved'";
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setInt(1, borrowerId);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("loan_id"),
+                    rs.getDouble("loan_amount"),
+                    rs.getString("loan_purpose"),
+                    rs.getTimestamp("application_date")
+                });
+            }
+            existingDebtTable.setModel(model);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load loan history.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private double calculateMonthlyAmortization(double principal, double annualRate, int termMonths) {
+        if (termMonths <= 0) {
+            return 0;
+        }
+        double totalInterest = principal * (annualRate / 100.0) * (termMonths / 12.0);
+
+        double totalRepayable = principal + totalInterest;
+
+        return totalRepayable / termMonths;
+    }
+    
+    private void updateTotalBalanceRemaining(double totalLoanAmount) {
+        String sql = "SELECT SUM(amount_paid) AS total_repaid FROM repayments WHERE loan_id = ?";
+        double totalRepaid = 0.0;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.selectedLoanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    totalRepaid = rs.getDouble("total_repaid");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            totalBalanceTextField.setText("Error");
+            return;
+        }
+
+        double remainingBalance = totalLoanAmount - totalRepaid;
+        totalBalanceTextField.setFont(new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, 14)); // Ensure font supports Peso symbol
+        totalBalanceTextField.setText(String.format("₱ %.2f", remainingBalance));
+    }
+    
+    private int fetchBorrowerId() {
+        String sql = "SELECT borrower_id FROM borrowers WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.loggedInUserId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("borrower_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /**
@@ -47,6 +165,8 @@ public class PayPage extends javax.swing.JInternalFrame {
         payDateFormattedTextField = new javax.swing.JFormattedTextField();
         jLabel5 = new javax.swing.JLabel();
         historyDateFormattedTextField = new javax.swing.JFormattedTextField();
+        jLabel6 = new javax.swing.JLabel();
+        totalBalanceTextField = new javax.swing.JTextField();
 
         setPreferredSize(new java.awt.Dimension(650, 500));
 
@@ -63,6 +183,11 @@ public class PayPage extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        existingDebtTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                existingDebtTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(existingDebtTable);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -71,7 +196,7 @@ public class PayPage extends javax.swing.JInternalFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("Amount to pay");
+        jLabel2.setText("Amount to pay per installment");
 
         existingDebtTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,11 +218,19 @@ public class PayPage extends javax.swing.JInternalFrame {
 
         payButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         payButton.setText("Pay");
+        payButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                payButtonActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("CURRENT DATE");
 
+        payDateFormattedTextField.setEditable(false);
+        payDateFormattedTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyy-MM-dd"))));
+        payDateFormattedTextField.setFocusable(false);
         payDateFormattedTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 payDateFormattedTextFieldActionPerformed(evt);
@@ -112,6 +245,16 @@ public class PayPage extends javax.swing.JInternalFrame {
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("History Date");
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("Total balance remaining");
+
+        totalBalanceTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                totalBalanceTextFieldActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -130,21 +273,25 @@ public class PayPage extends javax.swing.JInternalFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(37, 37, 37)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel2)
-                                    .addComponent(existingDebtTextField)
-                                    .addComponent(inputAmountTextField)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jSeparator1)
-                                    .addComponent(payDateFormattedTextField)
-                                    .addComponent(historyDateFormattedTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(89, 89, 89)
-                                .addComponent(payButton, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(46, Short.MAX_VALUE))
+                                .addComponent(payButton, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(totalBalanceTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(existingDebtTextField, javax.swing.GroupLayout.Alignment.LEADING))
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(historyDateFormattedTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(payDateFormattedTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(inputAmountTextField)))))))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -156,17 +303,21 @@ public class PayPage extends javax.swing.JInternalFrame {
                     .addComponent(searchDateButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(historyDateFormattedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalBalanceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(7, 7, 7)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(existingDebtTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
@@ -178,7 +329,7 @@ public class PayPage extends javax.swing.JInternalFrame {
                 .addComponent(inputAmountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(39, 39, 39)
                 .addComponent(payButton)
-                .addGap(87, 87, 87))
+                .addGap(44, 44, 44))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -208,11 +359,146 @@ public class PayPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_payDateFormattedTextFieldKeyReleased
 
     private void inputAmountTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputAmountTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        payDateFormattedTextField.setText(formattedDate);
+        
     }//GEN-LAST:event_inputAmountTextFieldKeyReleased
+
+    private void existingDebtTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_existingDebtTableMouseClicked
+        int selectedRow = existingDebtTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return;
+        }
+
+        this.selectedLoanId = (int) existingDebtTable.getValueAt(selectedRow, 0);
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "SELECT application_date, loan_amount, interest_rate_at_approval, repayment_term_months FROM loans WHERE loan_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, this.selectedLoanId);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                historyDateFormattedTextField.setText(rs.getTimestamp("application_date").toString());
+
+                double loanAmount = rs.getDouble("loan_amount");
+                double annualRate = rs.getDouble("interest_rate_at_approval");
+                int termInMonths = rs.getInt("repayment_term_months");
+
+                double monthlyPayment = calculateMonthlyAmortization(loanAmount, annualRate, termInMonths);
+                existingDebtTextField.setText(String.format("₱ %.2f", monthlyPayment));
+
+                updateTotalBalanceRemaining(loanAmount);
+                
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                payDateFormattedTextField.setText(today.format(formatter));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching loan details.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_existingDebtTableMouseClicked
+
+    private void payButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payButtonActionPerformed
+        if (this.selectedLoanId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a loan from the history table first.", "No Loan Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String amountText = inputAmountTextField.getText().trim();
+        if (amountText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please input an amount to pay.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        double amountToPay;
+        try {
+            amountToPay = Double.parseDouble(amountText);
+            if (amountToPay <= 0) {
+                JOptionPane.showMessageDialog(this, "Payment amount must be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid number for the payment amount.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement pstmtInsert = null;
+        PreparedStatement pstmtSelect = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+
+            String sqlInsert = "INSERT INTO repayments (loan_id, payment_date, amount_paid) VALUES (?, ?, ?)";
+            pstmtInsert = conn.prepareStatement(sqlInsert);
+
+            pstmtInsert.setInt(1, this.selectedLoanId);
+            pstmtInsert.setString(2, payDateFormattedTextField.getText());
+            pstmtInsert.setDouble(3, amountToPay);
+
+            int rowsAffected = pstmtInsert.executeUpdate();
+
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, String.format("Payment of %.2f was successful!", amountToPay), "Payment Confirmed", JOptionPane.INFORMATION_MESSAGE);
+
+                String sqlSelect = "SELECT loan_amount FROM loans WHERE loan_id = ?";
+                pstmtSelect = conn.prepareStatement(sqlSelect);
+                pstmtSelect.setInt(1, this.selectedLoanId);
+                rs = pstmtSelect.executeQuery();
+
+                if (rs.next()) {
+                    updateTotalBalanceRemaining(rs.getDouble("loan_amount"));
+                }
+
+                inputAmountTextField.setText("");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to process payment.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmtSelect != null) {
+                    pstmtSelect.close();
+                }
+                if (pstmtInsert != null) {
+                    pstmtInsert.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_payButtonActionPerformed
+
+    private void totalBalanceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalBalanceTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_totalBalanceTextFieldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -225,6 +511,7 @@ public class PayPage extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
@@ -232,5 +519,6 @@ public class PayPage extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField payDateFormattedTextField;
     private javax.swing.JButton searchDateButton;
     private javax.swing.JFormattedTextField searchDateFormattedTextField;
+    private javax.swing.JTextField totalBalanceTextField;
     // End of variables declaration//GEN-END:variables
 }
