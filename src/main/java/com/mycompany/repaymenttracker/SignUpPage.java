@@ -246,7 +246,6 @@ public class SignUpPage extends javax.swing.JFrame {
     }//GEN-LAST:event_returnButttonActionPerformed
 
     private void signUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpButtonActionPerformed
-        // 1. GET ALL DATA FROM THE UI
         String firstName = firstNameSUTextField.getText().trim();
         String middleName = middleNameSUTextField.getText().trim();
         String lastName = lastNameSUTextField.getText().trim();
@@ -256,7 +255,6 @@ public class SignUpPage extends javax.swing.JFrame {
         String password = new String(passwordField.getPassword());
         String confirmedPassword = new String(confirmPasswordField.getPassword());
 
-        // 2. ROBUST INPUT VALIDATION (Your improved method)
         if (firstName.isEmpty() || lastName.isEmpty() || contactNumber.isEmpty() || birthDate.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -281,9 +279,7 @@ public class SignUpPage extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please enter a valid contact number (7 to 15 digits).", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // END OF VALIDATION
 
-        // 3. DATABASE TRANSACTION
         Connection conn = null;
         PreparedStatement pstmtUser = null;
         PreparedStatement pstmtBorrower = null;
@@ -296,9 +292,8 @@ public class SignUpPage extends javax.swing.JFrame {
                 return;
             }
 
-            conn.setAutoCommit(false); // START TRANSACTION
+            conn.setAutoCommit(false);
 
-            // Part A: INSERT INTO 'users'
             String sqlUser = "INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'user')";
             pstmtUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -309,7 +304,6 @@ public class SignUpPage extends javax.swing.JFrame {
                 throw new SQLException("Creating user failed, no rows affected.");
             }
 
-            // Part B: GET THE NEW user_id
             long newUserId = -1;
             generatedKeys = pstmtUser.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -318,7 +312,6 @@ public class SignUpPage extends javax.swing.JFrame {
                 throw new SQLException("Creating user failed, no ID obtained.");
             }
 
-            // Part C: INSERT INTO 'borrowers'
             String sqlBorrower = "INSERT INTO borrowers (user_id, first_name, middle_name, last_name, birthdate, contact_number) VALUES (?, ?, ?, ?, ?, ?)";
             pstmtBorrower = conn.prepareStatement(sqlBorrower);
             pstmtBorrower.setLong(1, newUserId);
@@ -329,7 +322,7 @@ public class SignUpPage extends javax.swing.JFrame {
             pstmtBorrower.setString(6, contactNumber);
             pstmtBorrower.executeUpdate();
 
-            conn.commit(); // COMMIT transaction
+            conn.commit();
 
             JOptionPane.showMessageDialog(this, "Sign up successful! Please log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
 
@@ -426,7 +419,7 @@ public class SignUpPage extends javax.swing.JFrame {
     }
 
     public boolean isValidContact(String contact) {
-        return contact.matches("\\d{7,15}"); // 7 to 15 digits
+        return contact.matches("\\d{7,15}");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -616,7 +616,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             pstmtBorrower.setString(7, employmentStatus);
             pstmtBorrower.setString(8, homeAddress);
             pstmtBorrower.setString(9, validId);
-            pstmtBorrower.setInt(10, this.userId); // The crucial WHERE clause
+            pstmtBorrower.setInt(10, this.userId);
             pstmtBorrower.executeUpdate();
 
             String sqlUser = "UPDATE users SET email=? WHERE user_id=?";

@@ -57,7 +57,7 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
     }
     
     private void populateRepaymentTerms() {
-        repaymentTermComboBox.removeAllItems(); // Clear the default items
+        repaymentTermComboBox.removeAllItems();
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("SELECT term_months, interest_rate FROM interest_rates ORDER BY term_months ASC"); ResultSet rs = pstmt.executeQuery()) {
 
@@ -65,8 +65,8 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
                 int term = rs.getInt("term_months");
                 double rate = rs.getDouble("interest_rate");
 
-                repaymentTermComboBox.addItem(term + " Months"); // Add to the visible dropdown
-                interestRatesMap.put(term, rate); // Store the rate in our map for easy lookup
+                repaymentTermComboBox.addItem(term + " Months");
+                interestRatesMap.put(term, rate);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -79,10 +79,8 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
             return;
         }
 
-        // Extract the number from the string "X Months"
         int term = Integer.parseInt(selectedTermString.split(" ")[0]);
 
-        // Get the rate from our HashMap
         double rate = interestRatesMap.getOrDefault(term, 0.0);
 
         interestRateTextField.setText(String.format("%.2f %%", rate));
@@ -384,12 +382,10 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
             return;
         }
 
-        // 2. GET LOAN DETAILS
         String selectedTermString = (String) repaymentTermComboBox.getSelectedItem();
         int term = Integer.parseInt(selectedTermString.split(" ")[0]);
         double rate = interestRatesMap.get(term);
 
-        // 3. DATABASE INSERT
         try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("INSERT INTO loans (borrower_id, loan_amount, loan_purpose, repayment_term_months, interest_rate_at_approval, loan_status) VALUES (?, ?, ?, ?, ?, 'Pending')")) {
 
             pstmt.setInt(1, this.borrowerId);
@@ -402,7 +398,6 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
             if (rowsAffected > 0) {
                 JOptionPane.showMessageDialog(this, "Loan application submitted successfully! Your application is now pending review.", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-                // Clear the form
                 loanAmountTextField.setText("");
                 monthlyIncomeTextField.setText("");
                 loanPurposeTextArea.setText("");

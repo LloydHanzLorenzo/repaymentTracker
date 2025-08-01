@@ -320,7 +320,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
             }
 
         } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) { // Duplicate email error
+            if (e.getErrorCode() == 1062) {
                 JOptionPane.showMessageDialog(this, "This email address is already in use.", "Update Failed", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "A database error occurred.", "Error", JOptionPane.ERROR_MESSAGE);

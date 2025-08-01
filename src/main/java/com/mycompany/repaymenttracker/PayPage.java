@@ -23,7 +23,6 @@ public class PayPage extends javax.swing.JInternalFrame {
     /**
      * Creates new form PayPage for a specific user.
      *
-     * @param userId The ID of the user who is paying.
      */
     public PayPage(int userId) {
         this.loggedInUserId = userId;
@@ -32,16 +31,14 @@ public class PayPage extends javax.swing.JInternalFrame {
         historyDateFormattedTextField.setEditable(false);
         existingDebtTextField.setEditable(false);
         payDateFormattedTextField.setEditable(false);
+        totalBalanceTextField.setEditable(false);
 
         loadUserLoans();
     }
     
     private void loadUserLoans() {
-        // 1. DEFINE YOUR CUSTOM COLUMN NAMES
         String[] columnNames = {"Loan ID", "Amount", "Purpose", "Date Applied"};
 
-        // 2. CREATE THE TABLE MODEL WITH YOUR CUSTOM COLUMNS
-        // The '0' means the model starts with zero rows.
         javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(columnNames, 0);
 
         Connection conn = null;
@@ -50,31 +47,26 @@ public class PayPage extends javax.swing.JInternalFrame {
 
         try {
             conn = DBConnection.getConnection();
-            // The SQL query itself does not need to change
             String sql = "SELECT loan_id, loan_amount, loan_purpose, application_date FROM loans WHERE borrower_id = ? AND loan_status = 'Approved'";
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, this.loggedInUserId);
             rs = pstmt.executeQuery();
 
-            // 3. ADD ROW DATA FROM THE RESULTSET
             while (rs.next()) {
                 int loanId = rs.getInt("loan_id");
                 double amount = rs.getDouble("loan_amount");
                 String purpose = rs.getString("loan_purpose");
                 java.sql.Timestamp dateApplied = rs.getTimestamp("application_date");
 
-                // Add the data as a new row in the model
                 model.addRow(new Object[]{loanId, amount, purpose, dateApplied});
             }
 
-            // 4. SET THE COMPLETED MODEL ON THE JTABLE
             existingDebtTable.setModel(model);
 
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to load loan history.", "Database Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            // Close all resources
             try {
                 if (rs != null) {
                     rs.close();
@@ -95,14 +87,34 @@ public class PayPage extends javax.swing.JInternalFrame {
         if (termMonths <= 0) {
             return 0;
         }
-        // Calculate total interest: P * R * T (Principal * Rate * Time in years)
         double totalInterest = principal * (annualRate / 100.0) * (termMonths / 12.0);
 
-        // Total amount to be repaid is the principal plus the interest
         double totalRepayable = principal + totalInterest;
 
-        // Monthly payment is the total amount divided by the number of months
         return totalRepayable / termMonths;
+    }
+    
+    private void updateTotalBalanceRemaining(double totalLoanAmount) {
+        String sql = "SELECT SUM(amount_paid) AS total_repaid FROM repayments WHERE loan_id = ?";
+        double totalRepaid = 0.0;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.selectedLoanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    totalRepaid = rs.getDouble("total_repaid");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            totalBalanceTextField.setText("Error");
+            return;
+        }
+
+        double remainingBalance = totalLoanAmount - totalRepaid;
+        totalBalanceTextField.setFont(new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, 14)); // Ensure font supports Peso symbol
+        totalBalanceTextField.setText(String.format("₱ %.2f", remainingBalance));
     }
 
     /**
@@ -130,6 +142,8 @@ public class PayPage extends javax.swing.JInternalFrame {
         payDateFormattedTextField = new javax.swing.JFormattedTextField();
         jLabel5 = new javax.swing.JLabel();
         historyDateFormattedTextField = new javax.swing.JFormattedTextField();
+        jLabel6 = new javax.swing.JLabel();
+        totalBalanceTextField = new javax.swing.JTextField();
 
         setPreferredSize(new java.awt.Dimension(650, 500));
 
@@ -159,7 +173,7 @@ public class PayPage extends javax.swing.JInternalFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("Amount to pay");
+        jLabel2.setText("Amount to pay per installment");
 
         existingDebtTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -191,6 +205,9 @@ public class PayPage extends javax.swing.JInternalFrame {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("CURRENT DATE");
 
+        payDateFormattedTextField.setEditable(false);
+        payDateFormattedTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyy-MM-dd"))));
+        payDateFormattedTextField.setFocusable(false);
         payDateFormattedTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 payDateFormattedTextFieldActionPerformed(evt);
@@ -205,6 +222,16 @@ public class PayPage extends javax.swing.JInternalFrame {
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("History Date");
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("Total balance remaining");
+
+        totalBalanceTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                totalBalanceTextFieldActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -223,21 +250,25 @@ public class PayPage extends javax.swing.JInternalFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(37, 37, 37)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel2)
-                                    .addComponent(existingDebtTextField)
-                                    .addComponent(inputAmountTextField)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jSeparator1)
-                                    .addComponent(payDateFormattedTextField)
-                                    .addComponent(historyDateFormattedTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(89, 89, 89)
-                                .addComponent(payButton, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(46, Short.MAX_VALUE))
+                                .addComponent(payButton, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(totalBalanceTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(existingDebtTextField, javax.swing.GroupLayout.Alignment.LEADING))
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(historyDateFormattedTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(payDateFormattedTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(inputAmountTextField)))))))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -249,17 +280,21 @@ public class PayPage extends javax.swing.JInternalFrame {
                     .addComponent(searchDateButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(historyDateFormattedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(totalBalanceTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(7, 7, 7)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(existingDebtTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
@@ -271,7 +306,7 @@ public class PayPage extends javax.swing.JInternalFrame {
                 .addComponent(inputAmountTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(39, 39, 39)
                 .addComponent(payButton)
-                .addGap(87, 87, 87))
+                .addGap(44, 44, 44))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -301,23 +336,17 @@ public class PayPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_payDateFormattedTextFieldKeyReleased
 
     private void inputAmountTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputAmountTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        payDateFormattedTextField.setText(formattedDate);
+        
     }//GEN-LAST:event_inputAmountTextFieldKeyReleased
 
     private void existingDebtTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_existingDebtTableMouseClicked
         int selectedRow = existingDebtTable.getSelectedRow();
         if (selectedRow == -1) {
-            return; // User clicked the header or empty space
+            return;
         }
 
-        // Get the loan_id from the first column of the selected row.
-        // We stored this as the first column when we built the table model.
         this.selectedLoanId = (int) existingDebtTable.getValueAt(selectedRow, 0);
 
-        // Now, fetch the full details for this specific loan to do calculations
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -329,26 +358,26 @@ public class PayPage extends javax.swing.JInternalFrame {
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                // Populate the "History Date" field
                 historyDateFormattedTextField.setText(rs.getTimestamp("application_date").toString());
 
-                // Get the values needed for calculation
                 double loanAmount = rs.getDouble("loan_amount");
                 double annualRate = rs.getDouble("interest_rate_at_approval");
                 int termInMonths = rs.getInt("repayment_term_months");
 
-                // Calculate the expected monthly payment
                 double monthlyPayment = calculateMonthlyAmortization(loanAmount, annualRate, termInMonths);
+                existingDebtTextField.setText(String.format("₱ %.2f", monthlyPayment));
 
-                // Display the calculated amount in the "Amount to pay" field, formatted to 2 decimal places
-                existingDebtTextField.setText(String.format("%.2f", monthlyPayment));
+                updateTotalBalanceRemaining(loanAmount);
+                
+                LocalDate today = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                payDateFormattedTextField.setText(today.format(formatter));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error fetching loan details.", "Database Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            // Close resources
             try {
                 if (rs != null) {
                     rs.close();
@@ -389,40 +418,51 @@ public class PayPage extends javax.swing.JInternalFrame {
             return;
         }
 
-        // 2. DATABASE INSERT
         Connection conn = null;
-        PreparedStatement pstmt = null;
+        PreparedStatement pstmtInsert = null;
+        PreparedStatement pstmtSelect = null;
+        ResultSet rs = null;
+
         try {
             conn = DBConnection.getConnection();
-            String sql = "INSERT INTO repayments (loan_id, payment_date, amount_paid) VALUES (?, ?, ?)";
-            pstmt = conn.prepareStatement(sql);
 
-            pstmt.setInt(1, this.selectedLoanId);
-            pstmt.setString(2, payDateFormattedTextField.getText()); // Get the current date from the field
-            pstmt.setDouble(3, amountToPay);
+            String sqlInsert = "INSERT INTO repayments (loan_id, payment_date, amount_paid) VALUES (?, ?, ?)";
+            pstmtInsert = conn.prepareStatement(sqlInsert);
 
-            int rowsAffected = pstmt.executeUpdate();
+            pstmtInsert.setInt(1, this.selectedLoanId);
+            pstmtInsert.setString(2, payDateFormattedTextField.getText());
+            pstmtInsert.setDouble(3, amountToPay);
+
+            int rowsAffected = pstmtInsert.executeUpdate();
 
             if (rowsAffected > 0) {
                 JOptionPane.showMessageDialog(this, String.format("Payment of %.2f was successful!", amountToPay), "Payment Confirmed", JOptionPane.INFORMATION_MESSAGE);
 
-                // 3. CLEAR THE FORM AND RESET
-                this.selectedLoanId = -1;
-                historyDateFormattedTextField.setText("");
-                existingDebtTextField.setText("");
+                String sqlSelect = "SELECT loan_amount FROM loans WHERE loan_id = ?";
+                pstmtSelect = conn.prepareStatement(sqlSelect);
+                pstmtSelect.setInt(1, this.selectedLoanId);
+                rs = pstmtSelect.executeQuery();
+
+                if (rs.next()) {
+                    updateTotalBalanceRemaining(rs.getDouble("loan_amount"));
+                }
+
                 inputAmountTextField.setText("");
-                payDateFormattedTextField.setText("");
-                existingDebtTable.clearSelection(); // Deselect the row in the table
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to process payment.", "Database Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            // Close resources
             try {
-                if (pstmt != null) {
-                    pstmt.close();
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmtSelect != null) {
+                    pstmtSelect.close();
+                }
+                if (pstmtInsert != null) {
+                    pstmtInsert.close();
                 }
                 if (conn != null) {
                     conn.close();
@@ -432,6 +472,10 @@ public class PayPage extends javax.swing.JInternalFrame {
             }
         }
     }//GEN-LAST:event_payButtonActionPerformed
+
+    private void totalBalanceTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalBalanceTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_totalBalanceTextFieldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -444,6 +488,7 @@ public class PayPage extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
@@ -451,5 +496,6 @@ public class PayPage extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField payDateFormattedTextField;
     private javax.swing.JButton searchDateButton;
     private javax.swing.JFormattedTextField searchDateFormattedTextField;
+    private javax.swing.JTextField totalBalanceTextField;
     // End of variables declaration//GEN-END:variables
 }

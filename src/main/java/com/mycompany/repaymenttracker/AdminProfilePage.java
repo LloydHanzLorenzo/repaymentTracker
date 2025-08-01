@@ -72,7 +72,7 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
         emailField.setText("");
         passwordField.setText("");
         jobField.setText("");
-        statusComboBox.setSelectedIndex(0); // Set status back to "Active"
+        statusComboBox.setSelectedIndex(0);
     }
 
     /**

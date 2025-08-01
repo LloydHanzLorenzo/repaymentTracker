@@ -390,8 +390,8 @@ public class UserPage extends javax.swing.JFrame {
         );
 
         if (choice == JOptionPane.YES_OPTION) {
-            new MenuPage().setVisible(true); // Open the main menu/welcome screen
-            this.dispose();                  // Close the admin dashboard
+            new MenuPage().setVisible(true);
+            this.dispose();
         }
     }//GEN-LAST:event_logOutButtonActionPerformed
 
