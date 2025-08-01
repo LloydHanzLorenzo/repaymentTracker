@@ -333,7 +333,6 @@ public class SettingPage extends javax.swing.JInternalFrame {
         String aboutMessage = "<html><b>Repay Right Loan Manager v1.0</b><br><br>"
                 + "This application helps users manage their loans and track repayments.<br><br>"
                 + "<b>Developed by:</b><br>"
-                + "Zuleika Angelle Atizardo<br>"
                 + "Lloyd Hanz Lorenzo<br>"
                 + "Matthew C. Mesia<br>"
                 + "Zach Alexandre Nogueras<br>"
