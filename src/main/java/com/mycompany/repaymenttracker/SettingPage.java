@@ -320,7 +320,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
             }
 
         } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) { // Duplicate email error
+            if (e.getErrorCode() == 1062) {
                 JOptionPane.showMessageDialog(this, "This email address is already in use.", "Update Failed", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "A database error occurred.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -330,10 +330,15 @@ public class SettingPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_updateInfoButtonActionPerformed
 
     private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
-        String aboutMessage = "<html><b>Repayment Tracker v1.0</b><br><br>"
+        String aboutMessage = "<html><b>Repay Right Loan Manager v1.0</b><br><br>"
                 + "This application helps users manage their loans and track repayments.<br><br>"
                 + "<b>Developed by:</b><br>"
-                + "[Your Team Name or Your Names Here]<br><br>"
+                + "Zuleika Angelle Atizardo<br>"
+                + "Lloyd Hanz Lorenzo<br>"
+                + "Matthew C. Mesia<br>"
+                + "Zach Alexandre Nogueras<br>"
+                + "Danielle Sophia Serrato<br>"
+                + "Sean Audric R. Salvador<br><br>"
                 + "<b>Technology Used:</b><br>"
                 + "Java Swing, MySQL (via XAMPP)<br><br>"
                 + "© 2025</html>";

@@ -28,7 +28,6 @@ public class StartUpSplashScreen extends javax.swing.JFrame {
                 });
             } catch (InterruptedException e) {
                 System.err.println("Splash screen thread interrupted: " + e.getMessage());
-                // Open main window anyway if splash fails
                 java.awt.EventQueue.invokeLater(() -> {
                     new MenuPage().setVisible(true);
                     dispose();

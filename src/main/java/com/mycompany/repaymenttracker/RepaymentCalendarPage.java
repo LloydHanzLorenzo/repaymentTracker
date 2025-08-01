@@ -15,55 +15,75 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 
 
 public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
+    private int loggedInAdminId;
+    private java.util.Map<String, int[]> userLoanMap = new java.util.HashMap<>();
 
-    /** Creates new form RepaymentCalendarPage */
-    public RepaymentCalendarPage() {
+    public RepaymentCalendarPage(int adminId) {
+        this.loggedInAdminId = adminId;
         initComponents();
-
-        // Initialize and add the evaluator
-        HighlightEvaluator evaluator = new HighlightEvaluator();
-
-        // Replace this list with real data from DB or logic
-        List<Date> delinquentDates = getDelinquentDates();
-        for (Date d : delinquentDates) {
-            evaluator.add(d);
-        }
-
-        // Attach to calendar
-        jCalendar1.getDayChooser().addDateEvaluator(evaluator);
-        jCalendar1.setCalendar(jCalendar1.getCalendar());
+        
+        populateUserAccountComboBox();
     }
     
-    private List<Date> getDelinquentDates() {
-        List<Date> dates = new ArrayList<>();
+    private void populateUserAccountComboBox() {
+        accountListComboBox.removeAllItems();
+        userLoanMap.clear();
 
-        // Database credentials (replace these placeholders later)
-        String url = "jdbc:mysql://localhost:3306/your_database_name";
-        String user = "your_username";
-        String password = "your_password";
+        String sql = "SELECT b.borrower_id, l.loan_id, CONCAT(b.first_name, ' ', b.last_name, ' (Loan #', l.loan_id, ')') AS display_name "
+                + "FROM borrowers b "
+                + "JOIN loans l ON b.borrower_id = l.borrower_id "
+                + "WHERE l.loan_status = 'Approved' ORDER BY display_name ASC";
 
-        // Example SQL query - modify this once your schema is ready
-        String sql = "SELECT due_date FROM repayments WHERE status = 'delinquent'";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
+            accountListComboBox.addItem("Select a User...");
             while (rs.next()) {
-                Date dueDate = rs.getDate("due_date"); // SQL Date
-                if (dueDate != null) {
-                    dates.add(zeroTime(dueDate));
-                }
-            }
+                String displayName = rs.getString("display_name");
+                int borrowerId = rs.getInt("borrower_id");
+                int loanId = rs.getInt("loan_id");
 
-        } catch (Exception e) {
-            e.printStackTrace(); // Log error or show dialog in production
+                accountListComboBox.addItem(displayName);
+                userLoanMap.put(displayName, new int[]{borrowerId, loanId});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void displayPaymentInfo(Date approvalDate, double loanAmount, double annualRate, int termMonths) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(approvalDate);
+
+        while (cal.getTime().before(new Date())) {
+            cal.add(Calendar.MONTH, 1);
         }
 
-        return dates;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        paymentDeadlineField.setText(sdf.format(cal.getTime()));
+
+        double totalInterest = loanAmount * (annualRate / 100.0) * (termMonths / 12.0);
+        double monthlyPayment = (loanAmount + totalInterest) / termMonths;
+        amountDueField.setFont(new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, 18));
+        amountDueField.setText(String.format("₱ %.2f", monthlyPayment));
+    }
+
+    private void highlightPaymentDates(Date approvalDate, int termMonths) {
+        HighlightEvaluator evaluator = new HighlightEvaluator();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(approvalDate);
+
+        for (int i = 0; i < termMonths; i++) {
+            cal.add(Calendar.MONTH, 1);
+            evaluator.add(zeroTime(cal.getTime())); 
+        }
+
+        jCalendar1.getDayChooser().addDateEvaluator(evaluator);
+        jCalendar1.setCalendar(jCalendar1.getCalendar());
     }
     
     private Date zeroTime(Date date) {
@@ -75,20 +95,12 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
-
-    private Date createDate(int day) {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.DAY_OF_MONTH, day);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTime();
-    }
     
     private static class HighlightEvaluator implements IDateEvaluator {
 
         private final List<Date> list = new ArrayList<>();
+        
+        private final Color selectionColor = new Color(160, 160, 255);
 
         public void add(Date date) {
             list.add(date);
@@ -106,7 +118,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
 
         @Override
         public Color getSpecialBackroundColor() {
-            return Color.blue;
+            return new Color(255, 200, 200);
         }
 
         @Override
@@ -170,7 +182,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         jLabel1.setForeground(new java.awt.Color(0, 204, 204));
         jLabel1.setText("Repayment Calendar");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(null));
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jPanel5.setBackground(new java.awt.Color(153, 153, 153));
 
@@ -229,7 +241,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(null));
+        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel3.setPreferredSize(new java.awt.Dimension(634, 2));
 
         jPanel4.setBackground(new java.awt.Color(153, 153, 153));
@@ -255,7 +267,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
 
         jLabel2.setFont(new java.awt.Font("Nirmala UI", 1, 24)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel2.setText("User Account:");
+        jLabel2.setText("Borrower List:");
 
         accountListComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         accountListComboBox.addActionListener(new java.awt.event.ActionListener() {
@@ -274,6 +286,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         amountDueField.setEditable(false);
         amountDueField.setFont(new java.awt.Font("Nirmala UI", 0, 18)); // NOI18N
         amountDueField.setText("(Display amount to pay here)");
+        amountDueField.setFocusable(false);
         amountDueField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 amountDueFieldActionPerformed(evt);
@@ -283,6 +296,7 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         paymentDeadlineField.setEditable(false);
         paymentDeadlineField.setFont(new java.awt.Font("Nirmala UI", 0, 18)); // NOI18N
         paymentDeadlineField.setText("(Display amount to pay here)");
+        paymentDeadlineField.setFocusable(false);
         paymentDeadlineField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 paymentDeadlineFieldActionPerformed(evt);
@@ -324,9 +338,9 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(accountListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(accountListComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(46, 46, 46)
@@ -369,18 +383,50 @@ public class RepaymentCalendarPage extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1280, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void accountListComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accountListComboBoxActionPerformed
-        // TODO add your handling code here:
+        String selectedUser = (String) accountListComboBox.getSelectedItem();
+
+        if (selectedUser == null || selectedUser.equals("Select a User...")) {
+            paymentDeadlineField.setText("");
+            amountDueField.setText("");
+            jCalendar1.getDayChooser().addDateEvaluator(new HighlightEvaluator());
+            jCalendar1.repaint();
+            return;
+        }
+
+        int[] ids = userLoanMap.get(selectedUser);
+        int loanId = ids[1];
+
+        String sql = "SELECT approval_date, loan_amount, interest_rate_at_approval, repayment_term_months FROM loans WHERE loan_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, loanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Date approvalDate = rs.getDate("approval_date");
+                    double loanAmount = rs.getDouble("loan_amount");
+                    double annualRate = rs.getDouble("interest_rate_at_approval");
+                    int termMonths = rs.getInt("repayment_term_months");
+
+                    displayPaymentInfo(approvalDate, loanAmount, annualRate, termMonths);
+
+                    highlightPaymentDates(approvalDate, termMonths);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_accountListComboBoxActionPerformed
 
     private void amountDueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amountDueFieldActionPerformed

@@ -19,9 +19,9 @@ public class UpdatingInfoSplashScreen extends javax.swing.JFrame {
 
             new Thread(() -> {
             try {
-                Thread.sleep(3000); // Simulate update delay
+                Thread.sleep(3000);
                 java.awt.EventQueue.invokeLater(() -> {
-                    onComplete.run(); // This will run whatever you want after splash
+                    onComplete.run();
                     dispose();
                 });
             } catch (InterruptedException e) {

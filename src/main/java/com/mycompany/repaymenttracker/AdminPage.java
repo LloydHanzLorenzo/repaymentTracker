@@ -458,7 +458,7 @@ public class AdminPage extends javax.swing.JFrame {
     private void jPanel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MouseClicked
         // TODO add your handling code here:
         jDesktopPane1.removeAll();
-        AdminProfilePage APP = new AdminProfilePage();
+        AdminProfilePage APP = new AdminProfilePage(this.loggedInAdminId); 
         jDesktopPane1.add(APP).setVisible(true);
     }//GEN-LAST:event_jPanel3MouseClicked
 
@@ -481,10 +481,7 @@ public class AdminPage extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel5MousePressed
 
     private void jPanel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MouseClicked
-        // TODO add your handling code here:
-        jDesktopPane1.removeAll();
-        Borrowers BP = new Borrowers();
-        jDesktopPane1.add(BP).setVisible(true);
+        jLabel4MouseClicked(evt);
     }//GEN-LAST:event_jPanel8MouseClicked
 
     private void jPanel8MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel8MousePressed
@@ -499,8 +496,8 @@ public class AdminPage extends javax.swing.JFrame {
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
         // TODO add your handling code here:
         jDesktopPane1.removeAll();
-        DelinquentAccounts ma = new DelinquentAccounts();
-        jDesktopPane1.add(ma).setVisible(true);
+        DelinquentAccounts daPanel = new DelinquentAccounts(this.loggedInAdminId);
+        jDesktopPane1.add(daPanel).setVisible(true);
     }//GEN-LAST:event_jPanel10MouseClicked
 
     private void jPanel10MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MousePressed
@@ -523,14 +520,16 @@ public class AdminPage extends javax.swing.JFrame {
 
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         jDesktopPane1.removeAll();
-        AdminProfilePage APP = new AdminProfilePage();
+        AdminProfilePage APP = new AdminProfilePage(this.loggedInAdminId);
         jDesktopPane1.add(APP).setVisible(true);
     }//GEN-LAST:event_jLabel2MouseClicked
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
         jDesktopPane1.removeAll();
-        Borrowers BP = new Borrowers();
-        jDesktopPane1.add(BP).setVisible(true);
+        Borrowers borrowersPanel = new Borrowers(this.loggedInAdminId);
+        jDesktopPane1.add(borrowersPanel).setVisible(true);
+        jDesktopPane1.revalidate();
+        jDesktopPane1.repaint();
     }//GEN-LAST:event_jLabel4MouseClicked
 
     private void jLabel2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MousePressed
@@ -543,13 +542,13 @@ public class AdminPage extends javax.swing.JFrame {
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
         jDesktopPane1.removeAll();
-        RepaymentCalendarPage RCP = new RepaymentCalendarPage();
+        RepaymentCalendarPage RCP = new RepaymentCalendarPage(this.loggedInAdminId);
         jDesktopPane1.add(RCP).setVisible(true);
     }//GEN-LAST:event_jLabel3MouseClicked
 
     private void jPanel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel5MouseClicked
         jDesktopPane1.removeAll();
-        RepaymentCalendarPage RCP = new RepaymentCalendarPage();
+        RepaymentCalendarPage RCP = new RepaymentCalendarPage(this.loggedInAdminId);
         jDesktopPane1.add(RCP).setVisible(true);
     }//GEN-LAST:event_jPanel5MouseClicked
 
@@ -579,20 +578,20 @@ public class AdminPage extends javax.swing.JFrame {
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
         jDesktopPane1.removeAll();
-        DelinquentAccounts ma = new DelinquentAccounts();
-        jDesktopPane1.add(ma).setVisible(true);
+        DelinquentAccounts daPanel = new DelinquentAccounts(this.loggedInAdminId);
+        jDesktopPane1.add(daPanel).setVisible(true);
     }//GEN-LAST:event_jLabel5MouseClicked
 
     private void jPanel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel12MouseClicked
         jDesktopPane1.removeAll();
-        AlgorithmPage AP = new AlgorithmPage();
-        jDesktopPane1.add(AP).setVisible(true);
+        AlgorithmPage algorithmPanel = new AlgorithmPage(this.loggedInAdminId);
+        jDesktopPane1.add(algorithmPanel).setVisible(true);
+        jDesktopPane1.revalidate();
+        jDesktopPane1.repaint();
     }//GEN-LAST:event_jPanel12MouseClicked
 
     private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
-        jDesktopPane1.removeAll();
-        AlgorithmPage AP = new AlgorithmPage();
-        jDesktopPane1.add(AP).setVisible(true);
+        jPanel12MouseClicked(evt);
     }//GEN-LAST:event_jLabel6MouseClicked
 
     private void jLabel6MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MousePressed
