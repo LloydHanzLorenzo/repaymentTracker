@@ -37,8 +37,14 @@ public class PayPage extends javax.swing.JInternalFrame {
     }
     
     private void loadUserLoans() {
-        String[] columnNames = {"Loan ID", "Amount", "Purpose", "Date Applied"};
+        int borrowerId = fetchBorrowerId();
 
+        if (borrowerId == -1) {
+            JOptionPane.showMessageDialog(this, "Could not find a borrower profile for this user.", "Profile Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String[] columnNames = {"Loan ID", "Amount", "Purpose", "Date Applied"};
         javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(columnNames, 0);
 
         Connection conn = null;
@@ -49,18 +55,19 @@ public class PayPage extends javax.swing.JInternalFrame {
             conn = DBConnection.getConnection();
             String sql = "SELECT loan_id, loan_amount, loan_purpose, application_date FROM loans WHERE borrower_id = ? AND loan_status = 'Approved'";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, this.loggedInUserId);
+
+            pstmt.setInt(1, borrowerId);
+
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                int loanId = rs.getInt("loan_id");
-                double amount = rs.getDouble("loan_amount");
-                String purpose = rs.getString("loan_purpose");
-                java.sql.Timestamp dateApplied = rs.getTimestamp("application_date");
-
-                model.addRow(new Object[]{loanId, amount, purpose, dateApplied});
+                model.addRow(new Object[]{
+                    rs.getInt("loan_id"),
+                    rs.getDouble("loan_amount"),
+                    rs.getString("loan_purpose"),
+                    rs.getTimestamp("application_date")
+                });
             }
-
             existingDebtTable.setModel(model);
 
         } catch (SQLException e) {
@@ -115,6 +122,22 @@ public class PayPage extends javax.swing.JInternalFrame {
         double remainingBalance = totalLoanAmount - totalRepaid;
         totalBalanceTextField.setFont(new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, 14)); // Ensure font supports Peso symbol
         totalBalanceTextField.setText(String.format("₱ %.2f", remainingBalance));
+    }
+    
+    private int fetchBorrowerId() {
+        String sql = "SELECT borrower_id FROM borrowers WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.loggedInUserId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("borrower_id");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /**
