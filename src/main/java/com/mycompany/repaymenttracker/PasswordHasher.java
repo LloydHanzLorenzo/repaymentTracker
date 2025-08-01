@@ -12,7 +12,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class PasswordHasher {
 
     public static void main(String[] args) {
-        String plainPassword = "adminpass"; 
+        String plainPassword = "pass123"; 
         
         String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
         
