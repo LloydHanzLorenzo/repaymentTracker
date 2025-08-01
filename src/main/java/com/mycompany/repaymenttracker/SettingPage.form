@@ -55,7 +55,7 @@
                       <Component id="aboutButton" min="-2" pref="218" max="-2" attributes="0"/>
                       <Component id="updateEmailPasswordButton" min="-2" max="-2" attributes="0"/>
                       <Component id="jSeparator1" alignment="0" min="-2" pref="218" max="-2" attributes="0"/>
-                      <Component id="deleteAccountButton" min="-2" pref="218" max="-2" attributes="0"/>
+                      <Component id="deactivateAccountButton" min="-2" pref="218" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
               </Group>
@@ -71,7 +71,7 @@
                   <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                   <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="52" max="-2" attributes="0"/>
-                  <Component id="deleteAccountButton" min="-2" max="-2" attributes="0"/>
+                  <Component id="deactivateAccountButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="1" attributes="0">
@@ -83,18 +83,19 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="deleteAccountButton">
+        <Component class="javax.swing.JButton" name="deactivateAccountButton">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="12" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="DELETE ACCOUNT"/>
+            <Property name="text" type="java.lang.String" value="DEACTIVATE ACCOUNT"/>
             <Property name="borderPainted" type="boolean" value="false"/>
             <Property name="opaque" type="boolean" value="true"/>
           </Properties>
           <Events>
-            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="deleteAccountButtonMouseEntered"/>
-            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="deleteAccountButtonMouseExited"/>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="deactivateAccountButtonMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="deactivateAccountButtonMouseExited"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deactivateAccountButtonActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="updateEmailPasswordButton">
@@ -143,10 +144,10 @@
                                   <Component id="passwordLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="emailLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                                      <Component id="currentPasswordTextField" alignment="0" pref="202" max="32767" attributes="0"/>
-                                      <Component id="newPasswordTextField" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="newPasswordField" alignment="0" min="-2" pref="202" max="-2" attributes="0"/>
                                       <Component id="newEmailTextField" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jSeparator2" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="passwordField" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -169,7 +170,7 @@
                       <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Component id="passwordLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="currentPasswordTextField" min="-2" max="-2" attributes="0"/>
+                      <Component id="passwordField" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -179,7 +180,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="passwordLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="newPasswordTextField" min="-2" max="-2" attributes="0"/>
+                      <Component id="newPasswordField" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="32" max="32767" attributes="0"/>
                       <Component id="updateInfoButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
@@ -249,9 +250,9 @@
                 <Property name="text" type="java.lang.String" value="New Email:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="newPasswordTextField">
+            <Component class="javax.swing.JPasswordField" name="passwordField">
             </Component>
-            <Component class="javax.swing.JTextField" name="currentPasswordTextField">
+            <Component class="javax.swing.JPasswordField" name="newPasswordField">
             </Component>
           </SubComponents>
         </Container>
