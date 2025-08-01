@@ -6,20 +6,103 @@ package com.mycompany.repaymenttracker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author lloyd
  */
 public class PayPage extends javax.swing.JInternalFrame {
+    private int loggedInUserId;
+    private int selectedLoanId = -1;
 
     /**
-     * Creates new form PayPage
+     * Creates new form PayPage for a specific user.
+     *
+     * @param userId The ID of the user who is paying.
      */
-    public PayPage() {
+    public PayPage(int userId) {
+        this.loggedInUserId = userId;
         initComponents();
+
         historyDateFormattedTextField.setEditable(false);
+        existingDebtTextField.setEditable(false);
         payDateFormattedTextField.setEditable(false);
+
+        loadUserLoans();
+    }
+    
+    private void loadUserLoans() {
+        // 1. DEFINE YOUR CUSTOM COLUMN NAMES
+        String[] columnNames = {"Loan ID", "Amount", "Purpose", "Date Applied"};
+
+        // 2. CREATE THE TABLE MODEL WITH YOUR CUSTOM COLUMNS
+        // The '0' means the model starts with zero rows.
+        javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(columnNames, 0);
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            // The SQL query itself does not need to change
+            String sql = "SELECT loan_id, loan_amount, loan_purpose, application_date FROM loans WHERE borrower_id = ? AND loan_status = 'Approved'";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, this.loggedInUserId);
+            rs = pstmt.executeQuery();
+
+            // 3. ADD ROW DATA FROM THE RESULTSET
+            while (rs.next()) {
+                int loanId = rs.getInt("loan_id");
+                double amount = rs.getDouble("loan_amount");
+                String purpose = rs.getString("loan_purpose");
+                java.sql.Timestamp dateApplied = rs.getTimestamp("application_date");
+
+                // Add the data as a new row in the model
+                model.addRow(new Object[]{loanId, amount, purpose, dateApplied});
+            }
+
+            // 4. SET THE COMPLETED MODEL ON THE JTABLE
+            existingDebtTable.setModel(model);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load loan history.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            // Close all resources
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private double calculateMonthlyAmortization(double principal, double annualRate, int termMonths) {
+        if (termMonths <= 0) {
+            return 0;
+        }
+        // Calculate total interest: P * R * T (Principal * Rate * Time in years)
+        double totalInterest = principal * (annualRate / 100.0) * (termMonths / 12.0);
+
+        // Total amount to be repaid is the principal plus the interest
+        double totalRepayable = principal + totalInterest;
+
+        // Monthly payment is the total amount divided by the number of months
+        return totalRepayable / termMonths;
     }
 
     /**
@@ -63,6 +146,11 @@ public class PayPage extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        existingDebtTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                existingDebtTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(existingDebtTable);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -93,6 +181,11 @@ public class PayPage extends javax.swing.JInternalFrame {
 
         payButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         payButton.setText("Pay");
+        payButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                payButtonActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
@@ -213,6 +306,132 @@ public class PayPage extends javax.swing.JInternalFrame {
         String formattedDate = today.format(formatter);
         payDateFormattedTextField.setText(formattedDate);
     }//GEN-LAST:event_inputAmountTextFieldKeyReleased
+
+    private void existingDebtTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_existingDebtTableMouseClicked
+        int selectedRow = existingDebtTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return; // User clicked the header or empty space
+        }
+
+        // Get the loan_id from the first column of the selected row.
+        // We stored this as the first column when we built the table model.
+        this.selectedLoanId = (int) existingDebtTable.getValueAt(selectedRow, 0);
+
+        // Now, fetch the full details for this specific loan to do calculations
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "SELECT application_date, loan_amount, interest_rate_at_approval, repayment_term_months FROM loans WHERE loan_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, this.selectedLoanId);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Populate the "History Date" field
+                historyDateFormattedTextField.setText(rs.getTimestamp("application_date").toString());
+
+                // Get the values needed for calculation
+                double loanAmount = rs.getDouble("loan_amount");
+                double annualRate = rs.getDouble("interest_rate_at_approval");
+                int termInMonths = rs.getInt("repayment_term_months");
+
+                // Calculate the expected monthly payment
+                double monthlyPayment = calculateMonthlyAmortization(loanAmount, annualRate, termInMonths);
+
+                // Display the calculated amount in the "Amount to pay" field, formatted to 2 decimal places
+                existingDebtTextField.setText(String.format("%.2f", monthlyPayment));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching loan details.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            // Close resources
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_existingDebtTableMouseClicked
+
+    private void payButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payButtonActionPerformed
+        if (this.selectedLoanId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a loan from the history table first.", "No Loan Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String amountText = inputAmountTextField.getText().trim();
+        if (amountText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please input an amount to pay.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        double amountToPay;
+        try {
+            amountToPay = Double.parseDouble(amountText);
+            if (amountToPay <= 0) {
+                JOptionPane.showMessageDialog(this, "Payment amount must be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid number for the payment amount.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 2. DATABASE INSERT
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "INSERT INTO repayments (loan_id, payment_date, amount_paid) VALUES (?, ?, ?)";
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setInt(1, this.selectedLoanId);
+            pstmt.setString(2, payDateFormattedTextField.getText()); // Get the current date from the field
+            pstmt.setDouble(3, amountToPay);
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, String.format("Payment of %.2f was successful!", amountToPay), "Payment Confirmed", JOptionPane.INFORMATION_MESSAGE);
+
+                // 3. CLEAR THE FORM AND RESET
+                this.selectedLoanId = -1;
+                historyDateFormattedTextField.setText("");
+                existingDebtTextField.setText("");
+                inputAmountTextField.setText("");
+                payDateFormattedTextField.setText("");
+                existingDebtTable.clearSelection(); // Deselect the row in the table
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to process payment.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            // Close resources
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_payButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

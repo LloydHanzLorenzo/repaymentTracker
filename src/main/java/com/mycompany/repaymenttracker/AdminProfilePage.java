@@ -20,12 +20,59 @@ import javax.swing.JOptionPane;
  * @author admin
  */
 public class AdminProfilePage extends javax.swing.JInternalFrame {
+    private int loggedInAdminId;
+    private int selectedAdminId = -1;
 
     /**
      * Creates new form AdminProfilePage
      */
-    public AdminProfilePage() {
+    public AdminProfilePage(int adminId) {
+        this.loggedInAdminId = adminId;
         initComponents();
+        loadCurrentAdminInfo();
+        loadAdminTableData();
+    }
+    
+    private void loadCurrentAdminInfo() {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("SELECT email FROM users WHERE user_id = ?")) {
+
+            pstmt.setInt(1, this.loggedInAdminId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    userNameDisplayField.setText("Managing Users As: " + rs.getString("email"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadAdminTableData() {
+        DefaultTableModel model = new DefaultTableModel(new String[]{"User ID", "Email", "Status"}, 0);
+        String sql = "SELECT user_id, email, account_status FROM users WHERE role = 'admin'";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("user_id"),
+                    rs.getString("email"),
+                    rs.getString("account_status")
+                });
+            }
+            adminTable.setModel(model);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void clearForm() {
+        adminTable.clearSelection();
+        this.selectedAdminId = -1;
+        emailField.setText("");
+        passwordField.setText("");
+        jobField.setText("");
+        statusComboBox.setSelectedIndex(0); // Set status back to "Active"
     }
 
     /**
@@ -39,31 +86,22 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
 
         jPanel2 = new javax.swing.JPanel();
         userNameDisplayField = new javax.swing.JTextField();
-        contactNumberDisplayField = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
-        jTextField6 = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
+        emailField = new javax.swing.JTextField();
+        jobField = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        addButton = new javax.swing.JButton();
+        updateButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        adminTable = new javax.swing.JTable();
         jLabel19 = new javax.swing.JLabel();
         txtSearch = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
         btnLoad = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        passwordField = new javax.swing.JPasswordField();
+        jLabel8 = new javax.swing.JLabel();
+        statusComboBox = new javax.swing.JComboBox<>();
 
         jPanel2.setBackground(new java.awt.Color(102, 102, 102));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -72,23 +110,12 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
         userNameDisplayField.setBackground(new java.awt.Color(102, 102, 102));
         userNameDisplayField.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         userNameDisplayField.setForeground(new java.awt.Color(255, 255, 255));
-        userNameDisplayField.setText("(fullname should be here)");
+        userNameDisplayField.setText("(Current Admin's Email)");
         userNameDisplayField.setBorder(null);
+        userNameDisplayField.setFocusable(false);
         userNameDisplayField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 userNameDisplayFieldActionPerformed(evt);
-            }
-        });
-
-        contactNumberDisplayField.setEditable(false);
-        contactNumberDisplayField.setBackground(new java.awt.Color(102, 102, 102));
-        contactNumberDisplayField.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        contactNumberDisplayField.setForeground(new java.awt.Color(255, 255, 255));
-        contactNumberDisplayField.setText("(contact Number should be here)");
-        contactNumberDisplayField.setBorder(null);
-        contactNumberDisplayField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                contactNumberDisplayFieldActionPerformed(evt);
             }
         });
 
@@ -97,12 +124,8 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(userNameDisplayField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(contactNumberDisplayField, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(49, 49, 49)))
+                .addContainerGap(499, Short.MAX_VALUE)
+                .addComponent(userNameDisplayField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(471, 471, 471))
         );
         jPanel2Layout.setVerticalGroup(
@@ -110,63 +133,37 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(userNameDisplayField, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(contactNumberDisplayField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20))
+                .addGap(40, 40, 40))
         );
 
-        jLabel1.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
-        jLabel1.setText("First Name");
-        jLabel1.setToolTipText("");
-
-        jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
-        jLabel2.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
-        jLabel2.setText("Last Name");
-        jLabel2.setToolTipText("");
-
-        jTextField2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
-        jLabel3.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
-        jLabel3.setText("Birthdate");
-        jLabel3.setToolTipText("");
-
-        jTextField3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
-        jLabel4.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Nirmala UI", 1, 16)); // NOI18N
         jLabel4.setText("Email");
         jLabel4.setToolTipText("");
 
-        jTextField4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        emailField.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
 
-        jLabel5.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
-        jLabel5.setText("Contact Number");
-        jLabel5.setToolTipText("");
+        jobField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
-        jTextField5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
-        jTextField6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
-        jLabel6.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
-        jLabel6.setText("Address");
-        jLabel6.setToolTipText("");
-
-        jLabel9.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Nirmala UI", 1, 16)); // NOI18N
         jLabel9.setText("Job Role");
         jLabel9.setToolTipText("");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        addButton.setText("Add");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
-        jButton1.setText("Add");
+        updateButton.setText("Update");
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateButtonActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Update");
-
-        jButton3.setText("Delete");
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        adminTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        adminTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -177,7 +174,13 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        adminTable.getTableHeader().setReorderingAllowed(false);
+        adminTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                adminTableMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(adminTable);
 
         jLabel19.setText("Search:");
 
@@ -194,6 +197,19 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
                 btnLoadActionPerformed(evt);
             }
         });
+
+        jLabel7.setFont(new java.awt.Font("Nirmala UI", 1, 16)); // NOI18N
+        jLabel7.setText("Password");
+        jLabel7.setToolTipText("");
+
+        passwordField.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+
+        jLabel8.setFont(new java.awt.Font("Nirmala UI", 1, 16)); // NOI18N
+        jLabel8.setText("Account Status");
+        jLabel8.setToolTipText("");
+
+        statusComboBox.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Active", "Deactivated" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -212,87 +228,54 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnLoad))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 544, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(78, 78, 78)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel7)
+                        .addComponent(jLabel4)
+                        .addComponent(jLabel9)
+                        .addComponent(jLabel8)
+                        .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(emailField, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
+                        .addComponent(passwordField)
+                        .addComponent(jobField))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(69, 69, 69)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5)
-                            .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(102, 102, 102)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel9)
-                                    .addComponent(jTextField6)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(204, 204, 204)
-                        .addComponent(jButton1)
+                        .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)))
-                .addGap(105, 105, 105))
+                        .addComponent(updateButton)))
+                .addGap(58, 58, 58))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(79, 79, 79)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(emailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
+                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(33, 33, 33)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jobField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jButton3)
-                                .addComponent(jButton1)
-                                .addComponent(jButton2))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnSearch)
-                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel19)
-                                .addComponent(btnLoad)))))
+                        .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSearch)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel19)
+                    .addComponent(btnLoad)
+                    .addComponent(addButton)
+                    .addComponent(updateButton))
                 .addContainerGap(74, Short.MAX_VALUE))
         );
 
@@ -303,129 +286,170 @@ public class AdminProfilePage extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_userNameDisplayFieldActionPerformed
 
-    private void contactNumberDisplayFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactNumberDisplayFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_contactNumberDisplayFieldActionPerformed
-
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        // TODO add your handling code here:
         String keyword = txtSearch.getText().trim();
 
-        try {
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/borrowerdb", "root", "");
+        if (keyword.isEmpty()) {
+            loadAdminTableData();
+            return;
+        }
 
-            String sql = "SELECT * FROM borrowers WHERE "
-            + "full_name LIKE ? OR "
-            + "id_number LIKE ? OR "
-            + "email LIKE ? OR "
-            + "phone LIKE ? OR "
-            + "address LIKE ? OR "
-            + "employment_status LIKE ? OR "
-            + "loan_purpose LIKE ? OR "
-            + "loan_status LIKE ? OR "
-            + "notes LIKE ?";
+        DefaultTableModel model = new DefaultTableModel(new String[]{"User ID", "Email", "Status"}, 0);
 
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            String likeKeyword = "%" + keyword + "%";
+        String sql = "SELECT user_id, email, account_status FROM users WHERE role = 'admin' AND email LIKE ?";
 
-            pstmt.setString(1, likeKeyword);
-            pstmt.setString(2, likeKeyword);
-            pstmt.setString(3, likeKeyword);
-            pstmt.setString(4, likeKeyword);
-            pstmt.setString(5, likeKeyword);
-            pstmt.setString(6, likeKeyword);
-            pstmt.setString(7, likeKeyword);
-            pstmt.setString(8, likeKeyword);
-            pstmt.setString(9, likeKeyword);
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            ResultSet rs = pstmt.executeQuery();
+            pstmt.setString(1, "%" + keyword + "%");
 
-            DefaultTableModel model = new DefaultTableModel();
-            model.addColumn("ID");
-            model.addColumn("Full Name");
-            model.addColumn("Birthdate");
-            model.addColumn("ID Number");
-            model.addColumn("Email");
-            model.addColumn("Phone");
-            model.addColumn("Address");
-            model.addColumn("Employment Status");
-            model.addColumn("Monthly Income");
-            model.addColumn("Existing Debt");
-            model.addColumn("Loan Amount");
-            model.addColumn("Loan Purpose");
-            model.addColumn("Loan Status");
-            model.addColumn("Application Date");
-            model.addColumn("Approval Date");
-            model.addColumn("Repayment Term");
-            model.addColumn("Interest Rate");
-            model.addColumn("Notes");
+            try (ResultSet rs = pstmt.executeQuery()) {
 
-            while(rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getInt("id"),
-                    rs.getString("full_name"),
-                    rs.getDate("birthdate"),
-                    rs.getString("id_number"),
-                    rs.getString("email"),
-                    rs.getString("phone"),
-                    rs.getString("address"),
-                    rs.getString("employment_status"),
-                    rs.getBigDecimal("monthly_income"),
-                    rs.getBigDecimal("existing_debt"),
-                    rs.getBigDecimal("loan_amount"),
-                    rs.getString("loan_purpose"),
-                    rs.getString("loan_status"),
-                    rs.getTimestamp("application_date"),
-                    rs.getTimestamp("approval_date"),
-                    rs.getInt("repayment_term"),
-                    rs.getBigDecimal("interest_rate"),
-                    rs.getString("notes")
-                });
+                if (!rs.isBeforeFirst()) {
+                    JOptionPane.showMessageDialog(this, "No admin account found matching that email.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                    adminTable.setModel(model);
+                } else {
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                            rs.getInt("user_id"),
+                            rs.getString("email"),
+                            rs.getString("account_status")
+                        });
+                    }
+                    adminTable.setModel(model);
+                }
             }
-
-            //tblBorrowers.setModel(model);
-            conn.close();
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Search failed: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Search failed due to a database error.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadActionPerformed
         // TODO add your handling code here:
-     
+        loadAdminTableData();
     }//GEN-LAST:event_btnLoadActionPerformed
+
+    private void adminTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_adminTableMouseClicked
+        int selectedRow = adminTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return;
+        }
+
+        this.selectedAdminId = (int) adminTable.getValueAt(selectedRow, 0);
+        String email = adminTable.getValueAt(selectedRow, 1).toString();
+        String status = adminTable.getValueAt(selectedRow, 2).toString();
+
+        emailField.setText(email);
+        statusComboBox.setSelectedItem(status);
+
+        passwordField.setText("");
+        jobField.setText("Administrator");
+    }//GEN-LAST:event_adminTableMouseClicked
+
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        if (this.selectedAdminId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an admin from the table to update.");
+            return;
+        }
+
+        String newEmail = emailField.getText().trim();
+        String newPassword = new String(passwordField.getPassword());
+        String newStatus = statusComboBox.getSelectedItem().toString();
+
+        if (newEmail.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Email field cannot be empty.");
+            return;
+        }
+        if ("Deactivated".equals(newStatus) && this.selectedAdminId == this.loggedInAdminId) {
+            JOptionPane.showMessageDialog(this, "You cannot deactivate your own account.", "Action Not Allowed", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder("UPDATE users SET email = ?, account_status = ? ");
+        if (!newPassword.isEmpty()) {
+            sqlBuilder.append(", password_hash = ? ");
+        }
+        sqlBuilder.append("WHERE user_id = ?");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sqlBuilder.toString())) {
+
+            int paramIndex = 1;
+            pstmt.setString(paramIndex++, newEmail);
+            pstmt.setString(paramIndex++, newStatus);
+
+            if (!newPassword.isEmpty()) {
+                String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(newPassword, org.mindrot.jbcrypt.BCrypt.gensalt());
+                pstmt.setString(paramIndex++, hashedPassword);
+            }
+            pstmt.setInt(paramIndex, this.selectedAdminId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Admin account updated successfully.");
+                loadAdminTableData();
+                clearForm();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_updateButtonActionPerformed
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        String newAdminEmail = emailField.getText().trim();
+        String newPassword = new String(passwordField.getPassword());
+
+        if (newAdminEmail.isEmpty() || !newAdminEmail.contains("@")) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (newPassword.length() < 8) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String hashedPassword = org.mindrot.jbcrypt.BCrypt.hashpw(newPassword, org.mindrot.jbcrypt.BCrypt.gensalt());
+        String sql = "INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'admin')";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newAdminEmail);
+            pstmt.setString(2, hashedPassword);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "New admin account created successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadAdminTableData();
+
+                clearForm();
+            }
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) {
+                JOptionPane.showMessageDialog(this, "An account with this email address already exists.", "Add Failed", JOptionPane.ERROR_MESSAGE);
+            } else {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_addButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
+    private javax.swing.JTable adminTable;
     private javax.swing.JButton btnLoad;
     private javax.swing.JButton btnSearch;
-    private javax.swing.JTextField contactNumberDisplayField;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField emailField;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
+    private javax.swing.JTextField jobField;
+    private javax.swing.JPasswordField passwordField;
+    private javax.swing.JComboBox<String> statusComboBox;
     private javax.swing.JTextField txtSearch;
+    private javax.swing.JButton updateButton;
     private javax.swing.JTextField userNameDisplayField;
     // End of variables declaration//GEN-END:variables
 }

@@ -5,26 +5,63 @@
 package com.mycompany.repaymenttracker;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
  * @author lloyd
  */
 public class SettingPage extends javax.swing.JInternalFrame {
+    private int loggedInUserId;
     Color originalColor;
     /**
      * Creates new form SettingPage
      */
-    public SettingPage() {
+    public SettingPage(int userId) {
+        this.loggedInUserId = userId;
+
         initComponents();
+
         updateInfoButton.setVisible(false);
         newEmailTextField.setVisible(false);
         emailLabel2.setVisible(false);
-        newPasswordTextField.setVisible(false);
+        newPasswordField.setVisible(false);
         passwordLabel2.setVisible(false);
         currentEmailTextField.setEditable(false);
-        currentPasswordTextField.setEditable(false);
-        
+        passwordField.setEditable(false);
+        passwordField.setText("**********                            ");
+        passwordField.setSize(203, 22);
+
+        loadCurrentUserEmail();
+    }
+    
+    private void loadCurrentUserEmail() {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("SELECT email FROM users WHERE user_id = ?")) {
+            pstmt.setInt(1, this.loggedInUserId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    currentEmailTextField.setText(rs.getString("email"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load current email.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,6}$");
+    }
+
+    public boolean isValidPassword(String password) {
+        return password.length() >= 8;
     }
 
     /**
@@ -37,7 +74,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        deleteAccountButton = new javax.swing.JButton();
+        deactivateAccountButton = new javax.swing.JButton();
         updateEmailPasswordButton = new javax.swing.JButton();
         aboutButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
@@ -49,8 +86,8 @@ public class SettingPage extends javax.swing.JInternalFrame {
         passwordLabel2 = new javax.swing.JLabel();
         newEmailTextField = new javax.swing.JTextField();
         emailLabel2 = new javax.swing.JLabel();
-        newPasswordTextField = new javax.swing.JTextField();
-        currentPasswordTextField = new javax.swing.JTextField();
+        passwordField = new javax.swing.JPasswordField();
+        newPasswordField = new javax.swing.JPasswordField();
         jSeparator1 = new javax.swing.JSeparator();
 
         setPreferredSize(new java.awt.Dimension(650, 500));
@@ -58,16 +95,21 @@ public class SettingPage extends javax.swing.JInternalFrame {
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setPreferredSize(new java.awt.Dimension(640, 490));
 
-        deleteAccountButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        deleteAccountButton.setText("DELETE ACCOUNT");
-        deleteAccountButton.setBorderPainted(false);
-        deleteAccountButton.setOpaque(true);
-        deleteAccountButton.addMouseListener(new java.awt.event.MouseAdapter() {
+        deactivateAccountButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        deactivateAccountButton.setText("DEACTIVATE ACCOUNT");
+        deactivateAccountButton.setBorderPainted(false);
+        deactivateAccountButton.setOpaque(true);
+        deactivateAccountButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                deleteAccountButtonMouseEntered(evt);
+                deactivateAccountButtonMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                deleteAccountButtonMouseExited(evt);
+                deactivateAccountButtonMouseExited(evt);
+            }
+        });
+        deactivateAccountButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deactivateAccountButtonActionPerformed(evt);
             }
         });
 
@@ -129,10 +171,10 @@ public class SettingPage extends javax.swing.JInternalFrame {
                             .addComponent(passwordLabel2)
                             .addComponent(emailLabel2)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(currentPasswordTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                                .addComponent(newPasswordTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(newPasswordField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(newEmailTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING))))
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(passwordField, javax.swing.GroupLayout.Alignment.LEADING))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(70, 70, 70)
                         .addComponent(updateInfoButton, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -148,7 +190,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
                 .addGap(18, 18, 18)
                 .addComponent(passwordLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(currentPasswordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -158,7 +200,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(newPasswordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(newPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addComponent(updateInfoButton)
                 .addGap(31, 31, 31))
@@ -176,7 +218,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
                     .addComponent(aboutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(updateEmailPasswordButton)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(deleteAccountButton, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(deactivateAccountButton, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(70, 70, 70))
         );
         jPanel1Layout.setVerticalGroup(
@@ -189,7 +231,7 @@ public class SettingPage extends javax.swing.JInternalFrame {
                 .addGap(34, 34, 34)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(52, 52, 52)
-                .addComponent(deleteAccountButton)
+                .addComponent(deactivateAccountButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(35, Short.MAX_VALUE)
@@ -211,41 +253,174 @@ public class SettingPage extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void deleteAccountButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteAccountButtonMouseEntered
-        originalColor = deleteAccountButton.getBackground(); 
-        deleteAccountButton.setBackground(Color.RED);   
-    }//GEN-LAST:event_deleteAccountButtonMouseEntered
+    private void deactivateAccountButtonMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deactivateAccountButtonMouseEntered
+        originalColor = deactivateAccountButton.getBackground(); 
+        deactivateAccountButton.setBackground(Color.RED);   
+    }//GEN-LAST:event_deactivateAccountButtonMouseEntered
 
-    private void deleteAccountButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteAccountButtonMouseExited
-        deleteAccountButton.setBackground(originalColor);
-    }//GEN-LAST:event_deleteAccountButtonMouseExited
+    private void deactivateAccountButtonMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deactivateAccountButtonMouseExited
+        deactivateAccountButton.setBackground(originalColor);
+    }//GEN-LAST:event_deactivateAccountButtonMouseExited
 
     private void updateInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateInfoButtonActionPerformed
-        updateInfoButton.setVisible(false);
-        newEmailTextField.setVisible(false);
-        emailLabel2.setVisible(false);
-        newPasswordTextField.setVisible(false);
-        passwordLabel2.setVisible(false);
+        String newEmail = newEmailTextField.getText().trim();
+        String newPassword = new String(newPasswordField.getPassword());
+
+        if (newEmail.isEmpty() && newPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a new email or a new password to update.", "Input Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (!newEmail.isEmpty() && !isValidEmail(newEmail)) {
+            JOptionPane.showMessageDialog(this, "The new email address is not valid.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!newPassword.isEmpty() && !isValidPassword(newPassword)) {
+            JOptionPane.showMessageDialog(this, "The new password must be at least 8 characters long.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder("UPDATE users SET ");
+        if (!newEmail.isEmpty()) {
+            sqlBuilder.append("email = ? ");
+        }
+        if (!newPassword.isEmpty()) {
+            if (!newEmail.isEmpty()) {
+                sqlBuilder.append(", ");
+            }
+            sqlBuilder.append("password_hash = ? ");
+        }
+        sqlBuilder.append("WHERE user_id = ?");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sqlBuilder.toString())) {
+
+            int paramIndex = 1;
+            if (!newEmail.isEmpty()) {
+                pstmt.setString(paramIndex++, newEmail);
+            }
+            if (!newPassword.isEmpty()) {
+                String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+                pstmt.setString(paramIndex++, hashedPassword);
+            }
+            pstmt.setInt(paramIndex, this.loggedInUserId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Your information has been updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                updateInfoButton.setVisible(false);
+                newEmailTextField.setVisible(false);
+                emailLabel2.setVisible(false);
+                newPasswordField.setVisible(false);
+                passwordLabel2.setVisible(false);
+                newEmailTextField.setText("");
+                newPasswordField.setText("");
+                loadCurrentUserEmail();
+            }
+
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) { // Duplicate email error
+                JOptionPane.showMessageDialog(this, "This email address is already in use.", "Update Failed", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "A database error occurred.", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_updateInfoButtonActionPerformed
 
     private void aboutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutButtonActionPerformed
-        // TODO add your handling code here:
+        String aboutMessage = "<html><b>Repay Right Loan Manager v1.0</b><br><br>"
+                + "This application helps users manage their loans and track repayments.<br><br>"
+                + "<b>Developed by:</b><br>"
+                + "Zuleika Angelle Atizardo<br>"
+                + "Lloyd Hanz Lorenzo<br>"
+                + "Matthew C. Mesia<br>"
+                + "Zach Alexandre Nogueras<br>"
+                + "Danielle Sophia Serrato<br>"
+                + "Sean Audric R. Salvador<br><br>"
+                + "<b>Technology Used:</b><br>"
+                + "Java Swing, MySQL (via XAMPP)<br><br>"
+                + "© 2025</html>";
+
+        JOptionPane.showMessageDialog(
+                this,
+                aboutMessage,
+                "About Repayment Tracker",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }//GEN-LAST:event_aboutButtonActionPerformed
 
     private void updateEmailPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateEmailPasswordButtonActionPerformed
         updateInfoButton.setVisible(true);
         newEmailTextField.setVisible(true);
         emailLabel2.setVisible(true);
-        newPasswordTextField.setVisible(true);
+        newPasswordField.setVisible(true);
         passwordLabel2.setVisible(true);
+        
+        jPanel2.revalidate();
+        jPanel2.repaint();
     }//GEN-LAST:event_updateEmailPasswordButtonActionPerformed
+
+    private void deactivateAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deactivateAccountButtonActionPerformed
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to deactivate your account?\nYou will be logged out and unable to log in again.",
+                "Confirm Account Deactivation",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "UPDATE users SET account_status = 'Deactivated' WHERE user_id = ?";
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setInt(1, this.loggedInUserId);
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Your account has been successfully deactivated.", "Account Deactivated", JOptionPane.INFORMATION_MESSAGE);
+
+                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                if (topFrame != null) {
+                    topFrame.dispose();
+                }
+
+                new MenuPage().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "Could not find your account to deactivate.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "A database error occurred while deactivating the account.", "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_deactivateAccountButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton aboutButton;
     private javax.swing.JTextField currentEmailTextField;
-    private javax.swing.JTextField currentPasswordTextField;
-    private javax.swing.JButton deleteAccountButton;
+    private javax.swing.JButton deactivateAccountButton;
     private javax.swing.JLabel emailLabel;
     private javax.swing.JLabel emailLabel2;
     private javax.swing.JPanel jPanel1;
@@ -253,7 +428,8 @@ public class SettingPage extends javax.swing.JInternalFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTextField newEmailTextField;
-    private javax.swing.JTextField newPasswordTextField;
+    private javax.swing.JPasswordField newPasswordField;
+    private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
     private javax.swing.JLabel passwordLabel2;
     private javax.swing.JButton updateEmailPasswordButton;
