@@ -4,6 +4,16 @@
  */
 package com.mycompany.repaymenttracker;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
+import org.mindrot.jbcrypt.BCrypt;
+
 /**
  *
  * @author lloyd
@@ -29,8 +39,6 @@ public class SignUpPage extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         emailAddressTextField = new javax.swing.JTextField();
-        passwordTextField = new javax.swing.JTextField();
-        confirmedPasswordTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -46,6 +54,8 @@ public class SignUpPage extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         birthDateSUFormattedTextField = new javax.swing.JFormattedTextField();
+        passwordField = new javax.swing.JPasswordField();
+        confirmPasswordField = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(756, 480));
@@ -80,6 +90,11 @@ public class SignUpPage extends javax.swing.JFrame {
 
         signUpButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         signUpButton.setText("Sign Up");
+        signUpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signUpButtonActionPerformed(evt);
+            }
+        });
 
         returnButtton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         returnButtton.setText("Return");
@@ -109,11 +124,13 @@ public class SignUpPage extends javax.swing.JFrame {
 
         jLabel7.setFont(new java.awt.Font("Segoe UI Variable", 1, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setText("Birthdate:");
+        jLabel7.setText("Birthdate (yyyy-mm-dd):");
 
         jLabel8.setFont(new java.awt.Font("Segoe UI Variable", 1, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Contact Number:");
+
+        birthDateSUFormattedTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -142,13 +159,13 @@ public class SignUpPage extends javax.swing.JFrame {
                                     .addComponent(lastNameSUTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel6))
                                 .addGap(164, 164, 164)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jLabel3)
-                                    .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel1)
-                                    .addComponent(emailAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(emailAddressTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
                                     .addComponent(jLabel2)
-                                    .addComponent(confirmedPasswordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(passwordField)
+                                    .addComponent(confirmPasswordField))))
                         .addContainerGap(89, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -178,16 +195,16 @@ public class SignUpPage extends javax.swing.JFrame {
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(middleNameSUTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(middleNameSUTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(confirmedPasswordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lastNameSUTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lastNameSUTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(confirmPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel8)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -228,6 +245,125 @@ public class SignUpPage extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_returnButttonActionPerformed
 
+    private void signUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signUpButtonActionPerformed
+        String firstName = firstNameSUTextField.getText().trim();
+        String middleName = middleNameSUTextField.getText().trim();
+        String lastName = lastNameSUTextField.getText().trim();
+        String contactNumber = contactNumberSUTextField.getText().trim();
+        String birthDate = birthDateSUFormattedTextField.getText().trim();
+        String email = emailAddressTextField.getText().trim();
+        String password = new String(passwordField.getPassword());
+        String confirmedPassword = new String(confirmPasswordField.getPassword());
+
+        if (firstName.isEmpty() || lastName.isEmpty() || contactNumber.isEmpty() || birthDate.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!password.equals(confirmedPassword)) {
+            JOptionPane.showMessageDialog(this, "Passwords do not match.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidPassword(password)) {
+            JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidDate(birthDate)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid date in YYYY-MM-DD format.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidContact(contactNumber)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid contact number (7 to 15 digits).", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement pstmtUser = null;
+        PreparedStatement pstmtBorrower = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                JOptionPane.showMessageDialog(this, "Failed to connect to the database.", "Connection Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            conn.setAutoCommit(false);
+
+            String sqlUser = "INSERT INTO users (email, password_hash, role) VALUES (?, ?, 'user')";
+            pstmtUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+            pstmtUser.setString(1, email);
+            pstmtUser.setString(2, hashedPassword);
+            int userRowsAffected = pstmtUser.executeUpdate();
+            if (userRowsAffected == 0) {
+                throw new SQLException("Creating user failed, no rows affected.");
+            }
+
+            long newUserId = -1;
+            generatedKeys = pstmtUser.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                newUserId = generatedKeys.getLong(1);
+            } else {
+                throw new SQLException("Creating user failed, no ID obtained.");
+            }
+
+            String sqlBorrower = "INSERT INTO borrowers (user_id, first_name, middle_name, last_name, birthdate, contact_number) VALUES (?, ?, ?, ?, ?, ?)";
+            pstmtBorrower = conn.prepareStatement(sqlBorrower);
+            pstmtBorrower.setLong(1, newUserId);
+            pstmtBorrower.setString(2, firstName);
+            pstmtBorrower.setString(3, middleName);
+            pstmtBorrower.setString(4, lastName);
+            pstmtBorrower.setString(5, birthDate);
+            pstmtBorrower.setString(6, contactNumber);
+            pstmtBorrower.executeUpdate();
+
+            conn.commit();
+
+            JOptionPane.showMessageDialog(this, "Sign up successful! Please log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            new LogInPage().setVisible(true);
+            this.dispose();
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (e.getErrorCode() == 1062) {
+                JOptionPane.showMessageDialog(this, "This email address is already registered.", "Sign Up Failed", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "A database error occurred during sign up.", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        } finally {
+            try {
+                if (generatedKeys != null) {
+                    generatedKeys.close();
+                }
+                if (pstmtUser != null) {
+                    pstmtUser.close();
+                }
+                if (pstmtBorrower != null) {
+                    pstmtBorrower.close();
+                }
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_signUpButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -262,10 +398,33 @@ public class SignUpPage extends javax.swing.JFrame {
             }
         });
     }
+    
+    public boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    public boolean isValidPassword(String password) {
+        return password.length() >= 8;
+    }
+
+    public boolean isValidDate(String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            sdf.parse(date);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    public boolean isValidContact(String contact) {
+        return contact.matches("\\d{7,15}");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField birthDateSUFormattedTextField;
-    private javax.swing.JTextField confirmedPasswordTextField;
+    private javax.swing.JPasswordField confirmPasswordField;
     private javax.swing.JTextField contactNumberSUTextField;
     private javax.swing.JTextField emailAddressTextField;
     private javax.swing.JTextField firstNameSUTextField;
@@ -281,7 +440,7 @@ public class SignUpPage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField lastNameSUTextField;
     private javax.swing.JTextField middleNameSUTextField;
-    private javax.swing.JTextField passwordTextField;
+    private javax.swing.JPasswordField passwordField;
     private javax.swing.JButton returnButtton;
     private javax.swing.JButton signUpButton;
     // End of variables declaration//GEN-END:variables

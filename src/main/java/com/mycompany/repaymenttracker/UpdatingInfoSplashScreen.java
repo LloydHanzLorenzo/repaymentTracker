@@ -19,9 +19,9 @@ public class UpdatingInfoSplashScreen extends javax.swing.JFrame {
 
             new Thread(() -> {
             try {
-                Thread.sleep(3000); // Simulate update delay
+                Thread.sleep(3000);
                 java.awt.EventQueue.invokeLater(() -> {
-                    onComplete.run(); // This will run whatever you want after splash
+                    onComplete.run();
                     dispose();
                 });
             } catch (InterruptedException e) {
@@ -48,7 +48,7 @@ public class UpdatingInfoSplashScreen extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        statusLabel.setFont(new java.awt.Font("STFangsong", 1, 18)); // NOI18N
+        statusLabel.setFont(new java.awt.Font("STFangsong", 1, 16)); // NOI18N
         statusLabel.setText("INFORMATION IS BEING SAVED, PLEASE WAIT");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -56,16 +56,16 @@ public class UpdatingInfoSplashScreen extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(31, 31, 31)
                 .addComponent(statusLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(46, 46, 46)
+                .addGap(47, 47, 47)
                 .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

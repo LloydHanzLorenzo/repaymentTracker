@@ -8,22 +8,91 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author lloyd
  */
 public class BorrowMoneyPage extends javax.swing.JInternalFrame {
+    private int loggedInUserId;
+    private int borrowerId = -1;
+    private Map<Integer, Double> interestRatesMap = new HashMap<>();
 
     /**
      * Creates new form BorrowMoneyPage
      */
-    public BorrowMoneyPage() {
+    public BorrowMoneyPage(int userId) {
+        this.loggedInUserId = userId;
         initComponents();
+
         applicationDateFormattedTextField.setEditable(false);
         interestRateTextField.setEditable(false);
+
+        fetchBorrowerId();
+        populateRepaymentTerms();
+        updateInterestRate();
+
+        applicationDateFormattedTextField.setText(java.time.LocalDate.now().toString());
+    }
+    
+    private void fetchBorrowerId() {
+        String sql = "SELECT borrower_id, monthly_income FROM borrowers WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.loggedInUserId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    this.borrowerId = rs.getInt("borrower_id");
+
+                    java.math.BigDecimal income = rs.getBigDecimal("monthly_income");
+                    if (income != null) {
+                        monthlyIncomeTextField.setText(income.toPlainString());
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Could not find a borrower profile for this user.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void populateRepaymentTerms() {
+        repaymentTermComboBox.removeAllItems();
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("SELECT term_months, interest_rate FROM interest_rates ORDER BY term_months ASC"); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int term = rs.getInt("term_months");
+                double rate = rs.getDouble("interest_rate");
+
+                repaymentTermComboBox.addItem(term + " Months");
+                interestRatesMap.put(term, rate);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void updateInterestRate() {
+        String selectedTermString = (String) repaymentTermComboBox.getSelectedItem();
+        if (selectedTermString == null) {
+            return;
+        }
+
+        int term = Integer.parseInt(selectedTermString.split(" ")[0]);
+
+        double rate = interestRatesMap.getOrDefault(term, 0.0);
+
+        interestRateTextField.setText(String.format("%.2f %%", rate));
     }
 
     /**
@@ -295,55 +364,106 @@ public class BorrowMoneyPage extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void applyButtonLoanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonLoanActionPerformed
+        if (this.borrowerId == -1) {
+            JOptionPane.showMessageDialog(this, "Cannot apply for loan: Borrower profile not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String loanAmountStr = loanAmountTextField.getText().trim();
+        String monthlyIncomeStr = monthlyIncomeTextField.getText().trim();
+        String loanPurpose = loanPurposeTextArea.getText().trim();
 
+        if (loanAmountStr.isEmpty() || monthlyIncomeStr.isEmpty() || loanPurpose.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        double loanAmount;
+        java.math.BigDecimal monthlyIncome;
+        try {
+            loanAmount = Double.parseDouble(loanAmountStr);
+            monthlyIncome = new java.math.BigDecimal(monthlyIncomeStr);
+            if (loanAmount <= 0 || loanAmount > 50000) {
+                JOptionPane.showMessageDialog(this, "Loan amount must be between 1 and 50,000.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numbers for Loan Amount and Monthly Income.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String selectedTermString = (String) repaymentTermComboBox.getSelectedItem();
+        int term = Integer.parseInt(selectedTermString.split(" ")[0]);
+        double rate = interestRatesMap.get(term);
+
+        Connection conn = null;
+        PreparedStatement pstmtUpdate = null;
+        PreparedStatement pstmtInsert = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlUpdateBorrower = "UPDATE borrowers SET monthly_income = ? WHERE borrower_id = ?";
+            pstmtUpdate = conn.prepareStatement(sqlUpdateBorrower);
+            pstmtUpdate.setBigDecimal(1, monthlyIncome);
+            pstmtUpdate.setInt(2, this.borrowerId);
+            pstmtUpdate.executeUpdate();
+
+            String sqlInsertLoan = "INSERT INTO loans (borrower_id, loan_amount, loan_purpose, repayment_term_months, interest_rate_at_approval, loan_status) VALUES (?, ?, ?, ?, ?, 'Pending')";
+            pstmtInsert = conn.prepareStatement(sqlInsertLoan);
+            pstmtInsert.setInt(1, this.borrowerId);
+            pstmtInsert.setDouble(2, loanAmount);
+            pstmtInsert.setString(3, loanPurpose);
+            pstmtInsert.setInt(4, term);
+            pstmtInsert.setDouble(5, rate);
+
+            int rowsAffected = pstmtInsert.executeUpdate();
+            if (rowsAffected > 0) {
+                conn.commit();
+
+                JOptionPane.showMessageDialog(this, "Loan application submitted successfully! Your application is now pending review.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                loanAmountTextField.setText("");
+                loanPurposeTextArea.setText("");
+            } else {
+                conn.rollback();
+            }
+
+        } catch (SQLException e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to submit loan application.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (conn != null) try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            try {
+                if (pstmtUpdate != null) {
+                    pstmtUpdate.close();
+                }
+                if (pstmtInsert != null) {
+                    pstmtInsert.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_applyButtonLoanActionPerformed
 
     private void loanAmountTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_loanAmountTextFieldKeyReleased
-       try {
-            double income = Double.parseDouble(monthlyIncomeTextField.getText());
-            double loanAmount = Double.parseDouble(loanAmountTextField.getText());
-
-            if (loanAmount > 50000) {
-                interestRateTextField.setText("Max ₱50,000 only");
-                return;
-            }
-
-            String term = repaymentTermComboBox.getSelectedItem().toString();
-            double baseRate;
-
-            switch (term) {
-                case "3 Months": baseRate = 0.03; break;
-                case "6 Months": baseRate = 0.05; break;
-                case "12 Months": baseRate = 0.07; break;
-                case "24 Months": baseRate = 0.09; break;
-                default: baseRate = 0.05; break;
-            }
-
-            double ratio = loanAmount / income;
-
-            if (ratio > 5) {
-                baseRate += 0.03;
-            } else if (ratio > 3) {
-                baseRate += 0.02;
-            } else {
-                baseRate += 0.01;
-            }
-
-            interestRateTextField.setText(String.format("%.2f%%", baseRate * 100));
-
-        } catch (Exception e) {
-            interestRateTextField.setText("Invalid input");
-            
-        }
        
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        applicationDateFormattedTextField.setText(formattedDate);
     }//GEN-LAST:event_loanAmountTextFieldKeyReleased
 
     private void repaymentTermComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_repaymentTermComboBoxActionPerformed
-
+        updateInterestRate();
     }//GEN-LAST:event_repaymentTermComboBoxActionPerformed
 
     private void applicationDateFormattedTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_applicationDateFormattedTextFieldKeyReleased

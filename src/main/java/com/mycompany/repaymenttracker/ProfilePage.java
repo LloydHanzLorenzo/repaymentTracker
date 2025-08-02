@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 /**
@@ -18,8 +19,11 @@ public class ProfilePage extends javax.swing.JInternalFrame {
      private int userId;
     /**
      * Creates new form ProfilePage
+     * @param userId
      */
-    public ProfilePage() {
+    public ProfilePage(int userId) {
+        this.userId = userId;
+        
         initComponents();
         firstNameTextField.setEditable(false);
         middleNameTextField.setEditable(false);
@@ -28,11 +32,94 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         contactNumberTextField.setEditable(false);
         nationalityTextField.setEditable(false);
         emailAddressTextField.setEditable(false);
-        employmentStatusComboBox.setEditable(false);
         employmentStatusComboBox.setEnabled(false);
         validIdTextField.setEditable(false);
         homeAddressTextArea.setEditable(false);
+        
+        loadUserProfile();
     }
+    
+    private void loadUserProfile() {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "SELECT b.first_name, b.middle_name, b.last_name, b.birthdate, "
+                    + "b.contact_number, b.nationality, b.employment_status, b.home_address, "
+                    + "b.valid_id_number, u.email "
+                    + "FROM borrowers b "
+                    + "JOIN users u ON b.user_id = u.user_id "
+                    + "WHERE b.user_id = ?";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, this.userId);
+
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+
+                userNameDisplayField.setText(firstName + " " + lastName);
+                contactNumberDisplayField.setText(rs.getString("contact_number"));
+
+                firstNameTextField.setText(firstName);
+                middleNameTextField.setText(rs.getString("middle_name"));
+                lastNameTextField.setText(lastName);
+                birthdateFormattedTextField.setText(rs.getString("birthdate"));
+                contactNumberTextField.setText(rs.getString("contact_number"));
+                validIdTextField.setText(rs.getString("valid_id_number"));
+                nationalityTextField.setText(rs.getString("nationality"));
+                emailAddressTextField.setText(rs.getString("email"));
+                homeAddressTextArea.setText(rs.getString("home_address"));
+
+                employmentStatusComboBox.setSelectedItem(rs.getString("employment_status"));
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Could not find profile for user ID: " + this.userId, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error while loading profile.", "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,6}$");
+    }
+
+    public boolean isValidDate(String date) {
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            sdf.parse(date);
+            return true;
+        } catch (java.text.ParseException e) {
+            return false;
+        }
+    }
+
+    public boolean isValidContact(String contact) {
+        return contact.matches("^\\d{7,15}$");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -50,6 +137,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         userNameDisplayField = new javax.swing.JTextField();
         contactNumberDisplayField = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         emailAddressTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -112,6 +200,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         userNameDisplayField.setForeground(new java.awt.Color(255, 255, 255));
         userNameDisplayField.setText("(fullname should be here)");
         userNameDisplayField.setBorder(null);
+        userNameDisplayField.setFocusable(false);
         userNameDisplayField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 userNameDisplayFieldActionPerformed(evt);
@@ -124,21 +213,34 @@ public class ProfilePage extends javax.swing.JInternalFrame {
         contactNumberDisplayField.setForeground(new java.awt.Color(255, 255, 255));
         contactNumberDisplayField.setText("(contact Number should be here)");
         contactNumberDisplayField.setBorder(null);
+        contactNumberDisplayField.setFocusable(false);
         contactNumberDisplayField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 contactNumberDisplayFieldActionPerformed(evt);
             }
         });
 
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/userProfile.png"))); // NOI18N
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel6Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel2)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel6Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel2)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -210,6 +312,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
+        birthdateFormattedTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
         birthdateFormattedTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         birthdateFormattedTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -291,7 +394,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
             }
         });
 
-        employmentStatusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        employmentStatusComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unemployed", "Employed", " " }));
 
         jLabel11.setFont(new java.awt.Font("Nirmala UI", 1, 13)); // NOI18N
         jLabel11.setText("Valid I.D. Number");
@@ -392,11 +495,11 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(middleNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(middleNameTextField)
                     .addComponent(mNameEditButton)
-                    .addComponent(emailAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(emailAddressEditButton))
+                    .addComponent(emailAddressEditButton)
+                    .addComponent(emailAddressTextField))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -417,7 +520,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lNameEditButton)
                                     .addComponent(lastNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -444,7 +547,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(validIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(validIdEditButton))
-                                .addContainerGap(12, Short.MAX_VALUE))))))
+                                .addContainerGap(37, Short.MAX_VALUE))))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -472,24 +575,121 @@ public class ProfilePage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_firstNameTextFieldActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        UpdatingInfoSplashScreen splash = new UpdatingInfoSplashScreen(() -> {
+        String firstName = firstNameTextField.getText().trim();
+        String middleName = middleNameTextField.getText().trim();
+        String lastName = lastNameTextField.getText().trim();
+        String birthdate = birthdateFormattedTextField.getText().trim();
+        String contactNumber = contactNumberTextField.getText().trim();
+        String validId = validIdTextField.getText().trim();
+        String nationality = nationalityTextField.getText().trim();
+        String email = emailAddressTextField.getText().trim();
+        String employmentStatus = employmentStatusComboBox.getSelectedItem().toString();
+        String homeAddress = homeAddressTextArea.getText().trim();
 
-        firstNameTextField.setEditable(false);
-        middleNameTextField.setEditable(false);
-        lastNameTextField.setEditable(false);
-        birthdateFormattedTextField.setEditable(false);
-        contactNumberTextField.setEditable(false);
-        nationalityTextField.setEditable(false);
-        emailAddressTextField.setEditable(false);
-        employmentStatusComboBox.setEditable(false);
-        employmentStatusComboBox.setEnabled(false);
-        validIdTextField.setEditable(false);
-        homeAddressTextArea.setEditable(false);
-        
-        JOptionPane.showMessageDialog(this, "Information has been successfully updated!");
-    });
+        if (firstName.isEmpty() || lastName.isEmpty() || contactNumber.isEmpty() || birthdate.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "First Name, Last Name, Contact, Birthdate, and Email cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidDate(birthdate)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid date in YYYY-MM-DD format.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isValidContact(contactNumber)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid contact number (7 to 15 digits).", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    splash.setVisible(true);
+        Connection conn = null;
+        PreparedStatement pstmtBorrower = null;
+        PreparedStatement pstmtUser = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            if (conn == null) {
+                JOptionPane.showMessageDialog(this, "Failed to connect to the database.", "Connection Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            conn.setAutoCommit(false);
+
+            String sqlBorrower = "UPDATE borrowers SET first_name=?, middle_name=?, last_name=?, birthdate=?, "
+                    + "contact_number=?, nationality=?, employment_status=?, home_address=?, valid_id_number=? "
+                    + "WHERE user_id = ?";
+            pstmtBorrower = conn.prepareStatement(sqlBorrower);
+            pstmtBorrower.setString(1, firstName);
+            pstmtBorrower.setString(2, middleName);
+            pstmtBorrower.setString(3, lastName);
+            pstmtBorrower.setString(4, birthdate);
+            pstmtBorrower.setString(5, contactNumber);
+            pstmtBorrower.setString(6, nationality);
+            pstmtBorrower.setString(7, employmentStatus);
+            pstmtBorrower.setString(8, homeAddress);
+            pstmtBorrower.setString(9, validId);
+            pstmtBorrower.setInt(10, this.userId);
+            pstmtBorrower.executeUpdate();
+
+            String sqlUser = "UPDATE users SET email=? WHERE user_id=?";
+            pstmtUser = conn.prepareStatement(sqlUser);
+            pstmtUser.setString(1, email);
+            pstmtUser.setInt(2, this.userId);
+            pstmtUser.executeUpdate();
+
+            conn.commit();
+
+            UpdatingInfoSplashScreen splash = new UpdatingInfoSplashScreen(() -> {
+                firstNameTextField.setEditable(false);
+                middleNameTextField.setEditable(false);
+                lastNameTextField.setEditable(false);
+                birthdateFormattedTextField.setEditable(false);
+                contactNumberTextField.setEditable(false);
+                nationalityTextField.setEditable(false);
+                emailAddressTextField.setEditable(false);
+                employmentStatusComboBox.setEnabled(false);
+                validIdTextField.setEditable(false);
+                homeAddressTextArea.setEditable(false);
+
+                loadUserProfile();
+
+                JOptionPane.showMessageDialog(this, "Information has been successfully updated!");
+            });
+
+            splash.setVisible(true);
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (e.getErrorCode() == 1062) {
+                JOptionPane.showMessageDialog(this, "The email address '" + email + "' is already in use by another account.", "Update Failed", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "A database error occurred during the update.", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        } finally {
+            try {
+                if (pstmtBorrower != null) {
+                    pstmtBorrower.close();
+                }
+                if (pstmtUser != null) {
+                    pstmtUser.close();
+                }
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }//GEN-LAST:event_updateButtonActionPerformed
 
     private void emailAddressTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailAddressTextFieldActionPerformed
@@ -579,6 +779,7 @@ public class ProfilePage extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

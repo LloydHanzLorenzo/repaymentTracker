@@ -6,22 +6,164 @@ package com.mycompany.repaymenttracker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author lloyd
  */
 public class AlgorithmPage extends javax.swing.JInternalFrame {
+    private int loggedInAdminId;
 
     /**
      * Creates new form AlgorithmPage
      */
-    public AlgorithmPage() {
+    public AlgorithmPage(int adminId) {
+        this.loggedInAdminId = adminId;
         initComponents();
+
         iR3MonthsTextField.setEditable(false);
         iR6MonthsTextField.setEditable(false);
         iR12MonthsTextField.setEditable(false);
         iR24MonthsTextField.setEditable(false);
+        updateDateFormattedTextField.setEditable(false);
+
+        loadCurrentInterestRates();
+        updateDateFormattedTextField.setText(java.time.LocalDate.now().toString());
+        
+        loadInterestRateHistory();
+    }
+    
+    private void loadCurrentInterestRates() {
+        String sql = "SELECT term_months, interest_rate FROM interest_rates";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int term = rs.getInt("term_months");
+                double rate = rs.getDouble("interest_rate");
+
+                switch (term) {
+                    case 3:
+                        iR3MonthsTextField.setText(String.format("%.2f %%", rate));
+                        break;
+                    case 6:
+                        iR6MonthsTextField.setText(String.format("%.2f %%", rate));
+                        break;
+                    case 12:
+                        iR12MonthsTextField.setText(String.format("%.2f %%", rate));
+                        break;
+                    case 24:
+                        iR24MonthsTextField.setText(String.format("%.2f %%", rate));
+                        break;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load current interest rates.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void updateRate(Connection conn, int term, double newRate) throws SQLException {
+        conn.setAutoCommit(false);
+
+        PreparedStatement pstmtSelect = null;
+        PreparedStatement pstmtUpdate = null;
+        PreparedStatement pstmtLog = null;
+        ResultSet rs = null;
+
+        try {
+            String selectSql = "SELECT interest_rate FROM interest_rates WHERE term_months = ?";
+            pstmtSelect = conn.prepareStatement(selectSql);
+            pstmtSelect.setInt(1, term);
+            rs = pstmtSelect.executeQuery();
+
+            if (rs.next()) {
+                double oldRate = rs.getDouble("interest_rate");
+
+                String logSql = "INSERT INTO interest_rate_history (term_months, old_interest_rate, new_interest_rate, changed_by_admin_id) VALUES (?, ?, ?, ?)";
+                pstmtLog = conn.prepareStatement(logSql);
+                pstmtLog.setInt(1, term);
+                pstmtLog.setDouble(2, oldRate);
+                pstmtLog.setDouble(3, newRate);
+                pstmtLog.setInt(4, this.loggedInAdminId);
+                pstmtLog.executeUpdate();
+
+                String updateSql = "UPDATE interest_rates SET interest_rate = ? WHERE term_months = ?";
+                pstmtUpdate = conn.prepareStatement(updateSql);
+                pstmtUpdate.setDouble(1, newRate);
+                pstmtUpdate.setInt(2, term);
+                pstmtUpdate.executeUpdate();
+
+                conn.commit();
+            } else {
+                conn.rollback();
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                conn.rollback();
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+            }        
+            if (rs != null) {
+                rs.close();
+            }
+            if (pstmtSelect != null) {
+                pstmtSelect.close();
+            }
+            if (pstmtUpdate != null) {
+                pstmtUpdate.close();
+            }
+            if (pstmtLog != null) {
+                pstmtLog.close();
+            }
+        }
+    }
+    
+    private void loadInterestRateHistory() {
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Date", "Admin Email", "Term", "Old Rate", "New Rate"}, 0);
+
+        String sql = "SELECT h.change_date, u.email, h.term_months, h.old_interest_rate, h.new_interest_rate "
+                + "FROM interest_rate_history h "
+                + "LEFT JOIN users u ON h.changed_by_admin_id = u.user_id "
+                + "ORDER BY h.change_date DESC";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getTimestamp("change_date"),
+                    rs.getString("email"),
+                    rs.getInt("term_months") + " Months",
+                    rs.getDouble("old_interest_rate") + " %",
+                    rs.getDouble("new_interest_rate") + " %"
+                });
+            }
+            jTable1.setModel(model);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public boolean isValidDate(String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            sdf.parse(date);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     /**
@@ -36,7 +178,7 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        searchTableButton = new javax.swing.JButton();
         searchDateFormattedTextField = new javax.swing.JFormattedTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -77,8 +219,13 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setText("Search");
+        searchTableButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        searchTableButton.setText("Search");
+        searchTableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchTableButtonActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -235,6 +382,11 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
 
         loadTableButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         loadTableButton.setText("Load");
+        loadTableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadTableButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -248,7 +400,7 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(searchDateFormattedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)
+                        .addComponent(searchTableButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(loadTableButton)
                         .addGap(0, 344, Short.MAX_VALUE))
@@ -281,7 +433,7 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(54, 54, 54)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
+                            .addComponent(searchTableButton)
                             .addComponent(searchDateFormattedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1)
                             .addComponent(loadTableButton))
@@ -325,7 +477,46 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateIRButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateIRButtonActionPerformed
-        // TODO add your handling code here:
+        String rate3Str = UpdateInterestR3MonthsTextField.getText().trim();
+        String rate6Str = UpdateInterestR6MonthsTextField.getText().trim();
+        String rate12Str = UpdateInterestR12MonthsTextField.getText().trim();
+        String rate24Str = UpdateInterestR24MonthsTextField.getText().trim();
+
+        if (rate3Str.isEmpty() && rate6Str.isEmpty() && rate12Str.isEmpty() && rate24Str.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter at least one new interest rate to update.", "No Input", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try (Connection conn = DBConnection.getConnection()) {
+            if (!rate3Str.isEmpty()) {
+                updateRate(conn, 3, Double.parseDouble(rate3Str));
+            }
+            if (!rate6Str.isEmpty()) {
+                updateRate(conn, 6, Double.parseDouble(rate6Str));
+            }
+            if (!rate12Str.isEmpty()) {
+                updateRate(conn, 12, Double.parseDouble(rate12Str));
+            }
+            if (!rate24Str.isEmpty()) {
+                updateRate(conn, 24, Double.parseDouble(rate24Str));
+            }
+
+            JOptionPane.showMessageDialog(this, "Interest rates updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            loadCurrentInterestRates();
+            loadInterestRateHistory();
+
+            UpdateInterestR3MonthsTextField.setText("");
+            UpdateInterestR6MonthsTextField.setText("");
+            UpdateInterestR12MonthsTextField.setText("");
+            UpdateInterestR24MonthsTextField.setText("");
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numbers for the interest rates.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "A database error occurred while updating rates.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_updateIRButtonActionPerformed
 
     private void UpdateInterestR6MonthsTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateInterestR6MonthsTextFieldActionPerformed
@@ -345,10 +536,7 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_UpdateInterestR24MonthsTextFieldActionPerformed
 
     private void UpdateInterestR3MonthsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_UpdateInterestR3MonthsTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        updateDateFormattedTextField.setText(formattedDate);
+        
     }//GEN-LAST:event_UpdateInterestR3MonthsTextFieldKeyReleased
 
     private void updateDateFormattedTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateDateFormattedTextFieldActionPerformed
@@ -356,25 +544,73 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_updateDateFormattedTextFieldActionPerformed
 
     private void UpdateInterestR6MonthsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_UpdateInterestR6MonthsTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        updateDateFormattedTextField.setText(formattedDate);
+        
     }//GEN-LAST:event_UpdateInterestR6MonthsTextFieldKeyReleased
 
     private void UpdateInterestR12MonthsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_UpdateInterestR12MonthsTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        updateDateFormattedTextField.setText(formattedDate);
+        
     }//GEN-LAST:event_UpdateInterestR12MonthsTextFieldKeyReleased
 
     private void UpdateInterestR24MonthsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_UpdateInterestR24MonthsTextFieldKeyReleased
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = today.format(formatter);
-        updateDateFormattedTextField.setText(formattedDate);
+        
     }//GEN-LAST:event_UpdateInterestR24MonthsTextFieldKeyReleased
+
+    private void searchTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchTableButtonActionPerformed
+        String keyword = searchDateFormattedTextField.getText().trim();
+
+        if (keyword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a search term.", "Input Required", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String termSearchKeyword = keyword.toLowerCase().replace("months", "").trim();
+
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Date", "Admin Email", "Term", "Old Rate", "New Rate"}, 0);
+
+        String sql = "SELECT h.change_date, u.email, h.term_months, h.old_interest_rate, h.new_interest_rate "
+                + "FROM interest_rate_history h "
+                + "LEFT JOIN users u ON h.changed_by_admin_id = u.user_id "
+                + "WHERE CAST(h.change_date AS CHAR) LIKE ? "
+                + "OR u.email LIKE ? "
+                + "OR CAST(h.term_months AS CHAR) LIKE ? "
+                + "ORDER BY h.change_date DESC";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            String searchPattern = "%" + keyword + "%";
+            String termSearchPattern = "%" + termSearchKeyword + "%";
+
+            pstmt.setString(1, searchPattern);
+            pstmt.setString(2, searchPattern);
+            pstmt.setString(3, termSearchPattern);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.isBeforeFirst()) {
+                    JOptionPane.showMessageDialog(this, "No history found matching your search.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                    jTable1.setModel(model);
+                } else {
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                            rs.getTimestamp("change_date"),
+                            rs.getString("email"),
+                            rs.getInt("term_months") + " Months",
+                            rs.getDouble("old_interest_rate") + " %",
+                            rs.getDouble("new_interest_rate") + " %"
+                        });
+                    }
+                    jTable1.setModel(model);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Search failed due to a database error.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_searchTableButtonActionPerformed
+
+    private void loadTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadTableButtonActionPerformed
+        loadInterestRateHistory();
+        searchDateFormattedTextField.setText("");
+    }//GEN-LAST:event_loadTableButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -386,7 +622,6 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
     private javax.swing.JTextField iR24MonthsTextField;
     private javax.swing.JTextField iR3MonthsTextField;
     private javax.swing.JTextField iR6MonthsTextField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -403,6 +638,7 @@ public class AlgorithmPage extends javax.swing.JInternalFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JButton loadTableButton;
     private javax.swing.JFormattedTextField searchDateFormattedTextField;
+    private javax.swing.JButton searchTableButton;
     private javax.swing.JFormattedTextField updateDateFormattedTextField;
     private javax.swing.JButton updateIRButton;
     // End of variables declaration//GEN-END:variables

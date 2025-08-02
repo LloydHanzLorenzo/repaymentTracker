@@ -4,17 +4,69 @@
  */
 package com.mycompany.repaymenttracker;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Clipboard;
+
 /**
  *
  * @author admin
  */
 public class DelinquentAccounts extends javax.swing.JInternalFrame {
+    private int loggedInAdminId;
+    private int selectedLoanId = -1;
 
     /**
      * Creates new form DelinquentAccounts
      */
-    public DelinquentAccounts() {
+    public DelinquentAccounts(int adminId) {
+        this.loggedInAdminId = adminId;
         initComponents();
+        
+        phoneNumberLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        repaymentHistoryLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        loadDelinquentData();
+    }
+    
+    private void loadDelinquentData() {
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Loan ID", "Borrower Name", "Amount Owed", "Last Payment Date"}, 0);
+
+        String sql = "SELECT l.loan_id, CONCAT(b.first_name, ' ', b.last_name) AS borrower_name, "
+                + "(l.loan_amount - IFNULL(SUM(r.amount_paid), 0)) AS amount_owed, "
+                + "MAX(r.payment_date) AS last_payment_date, l.approval_date "
+                + "FROM loans l "
+                + "JOIN borrowers b ON l.borrower_id = b.borrower_id "
+                + "LEFT JOIN repayments r ON l.loan_id = r.loan_id "
+                + "WHERE l.loan_status = 'Approved' "
+                + "GROUP BY l.loan_id, borrower_name, l.loan_amount, l.approval_date "
+                + "HAVING amount_owed > 0 AND ("
+                + "    (last_payment_date IS NOT NULL AND last_payment_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY)) OR "
+                + "    (last_payment_date IS NULL AND approval_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY))"
+                + ")";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("loan_id"),
+                    rs.getString("borrower_name"),
+                    rs.getBigDecimal("amount_owed"),
+                    rs.getDate("last_payment_date")
+                });
+            }
+            delinquentTable.setModel(model);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load delinquent account data.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -29,18 +81,19 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        idSearchField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        delinquentTable = new javax.swing.JTable();
+        searchButton = new javax.swing.JButton();
+        loadDataButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        jLabel21 = new javax.swing.JLabel();
+        phoneNumberLabel = new javax.swing.JLabel();
+        repaymentHistoryLabel = new javax.swing.JLabel();
+        contactButton = new javax.swing.JButton();
+        rescheduleLoanButton = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(1260, 610));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -55,9 +108,9 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
         jLabel2.setText("ID");
         jLabel2.setToolTipText("");
 
-        jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        idSearchField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        delinquentTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -68,46 +121,111 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        delinquentTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                delinquentTableMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(delinquentTable);
 
-        jButton1.setFont(new java.awt.Font("Nirmala UI", 1, 14)); // NOI18N
-        jButton1.setText("Search");
+        searchButton.setFont(new java.awt.Font("Nirmala UI", 1, 14)); // NOI18N
+        searchButton.setText("Search");
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
 
-        jButton2.setFont(new java.awt.Font("Nirmala UI", 1, 14)); // NOI18N
-        jButton2.setText("Load Data");
+        loadDataButton.setFont(new java.awt.Font("Nirmala UI", 1, 14)); // NOI18N
+        loadDataButton.setText("Load Data");
+        loadDataButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadDataButtonActionPerformed(evt);
+            }
+        });
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/filter.png"))); // NOI18N
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jLabel3.setText("Profile");
+        jLabel21.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/userProfile2.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(61, 61, 61)
-                .addComponent(jLabel3)
-                .addContainerGap(63, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel21))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(71, 71, 71)
-                .addComponent(jLabel3)
-                .addContainerGap(73, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel21))
         );
 
-        jLabel4.setText("(Phone Number)");
+        phoneNumberLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        phoneNumberLabel.setText("(Phone Number)");
 
-        jLabel5.setText("(Previous repayment history, e.g. 3/5 loans repaid on time)");
+        repaymentHistoryLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        repaymentHistoryLabel.setText("(Repayment history, e.g. 3/5 loans repaid on time)");
 
-        jButton3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton3.setText("Contact");
+        contactButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        contactButton.setText("Contact");
+        contactButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contactButtonActionPerformed(evt);
+            }
+        });
 
-        jButton4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton4.setText("Reschedule Loan");
+        rescheduleLoanButton.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        rescheduleLoanButton.setText("Reschedule Loan");
+        rescheduleLoanButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rescheduleLoanButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(rescheduleLoanButton)
+                                    .addComponent(contactButton, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(88, 88, 88))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(phoneNumberLabel)
+                                .addGap(110, 110, 110))))
+                    .addComponent(repaymentHistoryLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 50, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap(15, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(phoneNumberLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(repaymentHistoryLabel)
+                .addGap(30, 30, 30)
+                .addComponent(contactButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(rescheduleLoanButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(37, 37, 37))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -120,32 +238,16 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(idSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGap(65, 65, 65)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jLabel5))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(77, 77, 77)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(122, 122, 122))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(99, 99, 99)))))
-                .addGap(50, 50, 50))
+                        .addComponent(loadDataButton, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(59, 59, 59))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,28 +255,18 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(idSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel2))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(loadDataButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
-                        .addGap(31, 31, 31)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(60, 60, 60)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 54, 1210, -1));
@@ -182,22 +274,254 @@ public class DelinquentAccounts extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void loadDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadDataButtonActionPerformed
+        loadDelinquentData();
+    }//GEN-LAST:event_loadDataButtonActionPerformed
+
+    private void delinquentTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_delinquentTableMouseClicked
+        int selectedRow = delinquentTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return;
+        }
+
+        this.selectedLoanId = (int) delinquentTable.getValueAt(selectedRow, 0);
+
+        String sql = "SELECT b.contact_number, "
+                + "(SELECT COUNT(*) FROM loans WHERE borrower_id = b.borrower_id AND loan_status = 'Paid') AS paid_loans, "
+                + "(SELECT COUNT(*) FROM loans WHERE borrower_id = b.borrower_id) AS total_loans "
+                + "FROM loans l JOIN borrowers b ON l.borrower_id = b.borrower_id WHERE l.loan_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.selectedLoanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    phoneNumberLabel.setText(rs.getString("contact_number"));
+
+                    int paidLoans = rs.getInt("paid_loans");
+                    int totalLoans = rs.getInt("total_loans");
+                    repaymentHistoryLabel.setText(String.format("Repayment History: %d/%d loans paid off.", paidLoans, totalLoans));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_delinquentTableMouseClicked
+
+    private void contactButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactButtonActionPerformed
+        if (this.selectedLoanId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an account from the table first.", "No Account Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String phoneNumber = "";
+        String emailAddress = "";
+
+        String sql = "SELECT b.contact_number, u.email FROM loans l "
+        + "JOIN borrowers b ON l.borrower_id = b.borrower_id "
+        + "JOIN users u ON b.user_id = u.user_id "
+        + "WHERE l.loan_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, this.selectedLoanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    phoneNumber = rs.getString("contact_number");
+                    emailAddress = rs.getString("email");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Could not find contact details for the selected account.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "A database error occurred while fetching contact details.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Object[] options = {"Copy Phone", "Copy Email", "Cancel"};
+        String message = "Borrower Contact Information:\n\n"
+        + "Phone: " + phoneNumber + "\n"
+        + "Email: " + emailAddress + "\n\n"
+        + "Which would you like to copy to the clipboard?";
+
+        int choice = JOptionPane.showOptionDialog(
+            this,
+            message,
+            "Contact Borrower",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+
+        String textToCopy = null;
+        if (choice == JOptionPane.YES_OPTION) {
+            textToCopy = phoneNumber;
+        } else if (choice == JOptionPane.NO_OPTION) {
+            textToCopy = emailAddress;
+        }
+
+        if (textToCopy != null) {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection stringSelection = new StringSelection(textToCopy);
+            clipboard.setContents(stringSelection, null);
+
+            JOptionPane.showMessageDialog(this, "'" + textToCopy + "' has been copied to the clipboard.", "Copied!", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_contactButtonActionPerformed
+
+    private void rescheduleLoanButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rescheduleLoanButtonActionPerformed
+        if (this.selectedLoanId == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a delinquent loan from the table first.", "No Loan Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int currentTerm = -1;
+        java.util.List<String> availableTerms = new java.util.ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("SELECT repayment_term_months FROM loans WHERE loan_id = ?")) {
+            pstmt.setInt(1, this.selectedLoanId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    currentTerm = rs.getInt("repayment_term_months");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Could not fetch current loan term.", "Database Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement("SELECT term_months FROM interest_rates ORDER BY term_months ASC"); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                availableTerms.add(rs.getString("term_months"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Could not load available loan terms.", "Database Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (availableTerms.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No loan terms are defined in the system.", "Configuration Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Object[] options = availableTerms.toArray();
+        String dialogMessage = "The current repayment term is " + currentTerm + " months.\n\n"
+                + "Select the new total repayment term in months:";
+
+        String newTermStr = (String) JOptionPane.showInputDialog(
+                this,
+                dialogMessage,
+                "Reschedule Loan",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (newTermStr == null) {
+            return;
+        }
+
+        int newTermInMonths = Integer.parseInt(newTermStr);
+
+        String sql = "UPDATE loans SET repayment_term_months = ?, notes = CONCAT(IFNULL(notes, ''), '\\nLoan rescheduled by admin.') WHERE loan_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, newTermInMonths);
+            pstmt.setInt(2, this.selectedLoanId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Loan #" + this.selectedLoanId + " has been successfully rescheduled to a " + newTermInMonths + "-month term.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                loadDelinquentData();
+
+                phoneNumberLabel.setText("(Phone Number)");
+                repaymentHistoryLabel.setText("(Repayment history, e.g. 3/5 loans repaid on time)");
+                this.selectedLoanId = -1;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "A database error occurred while rescheduling the loan.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_rescheduleLoanButtonActionPerformed
+
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+        String keyword = idSearchField.getText().trim();
+
+        if (keyword.isEmpty()) {
+            loadDelinquentData();
+            return;
+        }
+
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Loan ID", "Borrower Name", "Amount Owed", "Last Payment Date"}, 0);
+
+        String sql = "SELECT l.loan_id, CONCAT(b.first_name, ' ', b.last_name) AS borrower_name, "
+                + "(l.loan_amount - IFNULL(SUM(r.amount_paid), 0)) AS amount_owed, "
+                + "MAX(r.payment_date) AS last_payment_date, l.approval_date "
+                + "FROM loans l "
+                + "JOIN borrowers b ON l.borrower_id = b.borrower_id "
+                + "LEFT JOIN repayments r ON l.loan_id = r.loan_id "
+                + "WHERE l.loan_status = 'Approved' AND CAST(l.loan_id AS CHAR) LIKE ? "
+                + "GROUP BY l.loan_id, borrower_name, l.loan_amount, l.approval_date "
+                + "HAVING amount_owed > 0 AND ("
+                + "    (last_payment_date IS NOT NULL AND last_payment_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY)) OR "
+                + "    (last_payment_date IS NULL AND approval_date < DATE_SUB(CURDATE(), INTERVAL 35 DAY))"
+                + ")";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, "%" + keyword + "%");
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.isBeforeFirst()) {
+                    JOptionPane.showMessageDialog(this, "No delinquent records found for Loan ID containing '" + keyword + "'", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+                    model.setRowCount(0);
+                    delinquentTable.setModel(model);
+                } else {
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                            rs.getInt("loan_id"),
+                            rs.getString("borrower_name"),
+                            rs.getBigDecimal("amount_owed"),
+                            rs.getDate("last_payment_date")
+                        });
+                    }
+                    delinquentTable.setModel(model);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Search failed due to a database error.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_searchButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton contactButton;
+    private javax.swing.JTable delinquentTable;
+    private javax.swing.JTextField idSearchField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JButton loadDataButton;
+    private javax.swing.JLabel phoneNumberLabel;
+    private javax.swing.JLabel repaymentHistoryLabel;
+    private javax.swing.JButton rescheduleLoanButton;
+    private javax.swing.JButton searchButton;
     // End of variables declaration//GEN-END:variables
 }

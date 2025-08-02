@@ -28,7 +28,6 @@ public class StartUpSplashScreen extends javax.swing.JFrame {
                 });
             } catch (InterruptedException e) {
                 System.err.println("Splash screen thread interrupted: " + e.getMessage());
-                // Open main window anyway if splash fails
                 java.awt.EventQueue.invokeLater(() -> {
                     new MenuPage().setVisible(true);
                     dispose();
@@ -53,7 +52,7 @@ public class StartUpSplashScreen extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Segoe UI Semibold", 1, 48)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 153, 153));
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Logo Repay Right (1).png"))); // NOI18N
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Repay_Right_Logo.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
